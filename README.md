@@ -1,2 +1,2 @@
 # Porcelana
-Website for guiding you on how to use 3D on web.
+Website viewing 3D and helping you on how to use 3D on web.

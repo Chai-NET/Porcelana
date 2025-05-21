@@ -1,11 +1,11 @@
+import MainPage from "../src/pages/main_page.jsx";
 
 function App() {
-
   return (
     <>
-       <div></div>
+      <MainPage />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
