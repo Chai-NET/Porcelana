@@ -53,8 +53,8 @@ const ThreeDObjectViewer = () => {
     cameraRef.current = camera;
 
     // Add default geometry (cube)
-    const geometry = new THREE.BoxGeometry(2, 2, 2);
-    const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+    const geometry = new THREE.BoxGeometry(3, 3, 3);
+    const material = new THREE.MeshLambertMaterial({ color: 0x252525 });
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
     meshRef.current = mesh;
@@ -142,7 +142,7 @@ const ThreeDObjectViewer = () => {
     switch (mode) {
       case "wireframe":
         return new THREE.MeshBasicMaterial({
-          color: 0x00ff00,
+          color: 0x0000ff,
           wireframe: true,
         });
 
