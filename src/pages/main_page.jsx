@@ -1,6 +1,6 @@
 import Home from "../components/home.jsx";
 import Empty from "../components/empty.jsx";
-import ObjectViewer from "../components/3d-object-viewer.jsx";
+import ObjectViewer from "../components/3d-viewer";
 
 function MainPage() {
   return (
