@@ -34,7 +34,7 @@ export const createMaterial = (mode, geometry) => {
 
     case "basecolor":
       return new THREE.MeshLambertMaterial({
-        color: 0x00aa88,
+        color: 0x4e8eed,
       });
 
     case "normals":

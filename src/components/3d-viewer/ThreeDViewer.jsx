@@ -68,7 +68,7 @@ const ThreeDViewer = () => {
       const fileExtension = file.name.split(".").pop().toLowerCase();
       setStats((prev) => ({ ...prev, format: `.${fileExtension}` }));
 
-      // For demo purposes, we'll create different geometries based on file extension
+      // different geometries based on file extension
       let geometry;
       switch (fileExtension) {
         case "obj":
