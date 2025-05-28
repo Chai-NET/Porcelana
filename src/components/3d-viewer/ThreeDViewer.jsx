@@ -138,11 +138,11 @@ const ThreeDViewer = () => {
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
-      <div className="relative flex-1">
+    <div className="fixed inset-0 flex overflow-hidden bg-gray-900 text-white">
+      <div className="relative flex-1 overflow-hidden">
         <div
           ref={mountRef}
-          className="h-full w-full cursor-grab active:cursor-grabbing"
+          className="absolute inset-0 cursor-grab active:cursor-grabbing"
           onMouseDown={handleMouseDown}
         />
         <Loading isLoading={isLoading} />
