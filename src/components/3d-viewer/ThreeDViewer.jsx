@@ -64,51 +64,60 @@ const ThreeDViewer = () => {
     setIsLoading(true);
     setError("");
 
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+    if (fileExtension !== "glb") {
+      setError("Only .glb files are supported.");
+      setIsLoading(false);
+      return;
+    }
+
+    setStats((prev) => ({ ...prev, format: `.glb` }));
+
     try {
-      const fileExtension = file.name.split(".").pop().toLowerCase();
-      setStats((prev) => ({ ...prev, format: `.${fileExtension}` }));
+      // Dynamically import GLTFLoader
+      const module = await import("three/examples/jsm/loaders/GLTFLoader.js");
+      const GLTFLoader = module.GLTFLoader;
+      const loader = new GLTFLoader();
+      const url = URL.createObjectURL(file);
+      loader.load(
+        url,
+        (gltf) => {
+          // Remove old mesh
+          if (meshRef.current) {
+            sceneRef.current.remove(meshRef.current);
+            if (meshRef.current.geometry) meshRef.current.geometry.dispose();
+            if (meshRef.current.material) meshRef.current.material.dispose();
+          }
+          // Add new mesh (first scene child)
+          const model = gltf.scene.children[0];
+          sceneRef.current.add(model);
+          meshRef.current = model;
 
-      // different geometries based on file extension
-      let geometry;
-      switch (fileExtension) {
-        case "obj":
-          geometry = new THREE.SphereGeometry(2, 32, 32);
-          break;
-        case "fbx":
-          geometry = new THREE.TorusGeometry(1.5, 0.5, 16, 100);
-          break;
-        case "gltf":
-        case "glb":
-          geometry = new THREE.IcosahedronGeometry(2, 2);
-          break;
-        default:
-          geometry = new THREE.ConeGeometry(1.5, 3, 12);
-      }
-
-      // Remove old mesh
-      if (meshRef.current) {
-        sceneRef.current.remove(meshRef.current);
-        meshRef.current.geometry.dispose();
-        meshRef.current.material.dispose();
-      }
-
-      // Create new mesh
-      const material = createMaterial(viewMode, geometry);
-      const mesh = new THREE.Mesh(geometry, material);
-      sceneRef.current.add(mesh);
-      meshRef.current = mesh;
-
-      // Update stats
-      const triangles = geometry.index
-        ? geometry.index.count / 3
-        : geometry.attributes.position.count / 3;
-      const vertices = geometry.attributes.position.count;
-
-      setStats({
-        triangles: Math.floor(triangles),
-        vertices: vertices,
-        format: `.${fileExtension}`,
-      });
+          // Compute stats
+          let triangles = 0,
+            vertices = 0;
+          model.traverse((child) => {
+            if (child.isMesh && child.geometry) {
+              triangles += child.geometry.index
+                ? child.geometry.index.count / 3
+                : child.geometry.attributes.position.count / 3;
+              vertices += child.geometry.attributes.position.count;
+            }
+          });
+          setStats({
+            triangles: Math.floor(triangles),
+            vertices: vertices,
+            format: `.glb`,
+          });
+          URL.revokeObjectURL(url);
+        },
+        undefined,
+        (err) => {
+          setError("Failed to load GLB model. Please try a different file.");
+          setIsLoading(false);
+          URL.revokeObjectURL(url);
+        },
+      );
     } catch (err) {
       setError("Failed to load 3D model. Please try a different file.");
       console.error("Error loading file:", err);

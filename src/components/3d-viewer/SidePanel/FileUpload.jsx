@@ -10,14 +10,12 @@ const FileUpload = ({ onFileUpload }) => (
         <span className="text-sm text-gray-300">
           Drop file here or click to browse
         </span>
-        <div className="mt-1 text-xs text-gray-400">
-          Supports OBJ, FBX, GLTF, GLB
-        </div>
+        <div className="mt-1 text-xs text-gray-400">Supports GLB only</div>
       </div>
       <input
         type="file"
         className="hidden"
-        accept=".obj,.fbx,.gltf,.glb"
+        accept=".glb"
         onChange={onFileUpload}
       />
     </label>
