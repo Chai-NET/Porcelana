@@ -10,6 +10,7 @@ const ViewModeControls = ({ viewMode, setViewMode }) => (
         { key: "matcap", label: "Matcap" },
         { key: "basecolor", label: "Base Color" },
         { key: "normals", label: "Vertex Normals" },
+        { key: "texture", label: "Texture" },
       ].map(({ key, label }) => (
         <button
           key={key}

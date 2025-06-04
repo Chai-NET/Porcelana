@@ -17,7 +17,6 @@ const ThreeDViewer = () => {
   const { mountRef, sceneRef, cameraRef, meshRef, stats, setStats } =
     useThreeScene();
 
-  // Mouse controls for rotation
   const handleMouseDown = useCallback((e) => {
     setIsDragging(true);
     setLastMousePos({ x: e.clientX, y: e.clientY });
@@ -42,21 +41,32 @@ const ThreeDViewer = () => {
     setIsDragging(false);
   }, []);
 
-  // Update material based on view mode
   React.useEffect(() => {
     if (!meshRef.current) return;
 
-    const newMaterial = createMaterial(viewMode, meshRef.current.geometry);
-    const oldMaterial = meshRef.current.material;
-    meshRef.current.material = newMaterial;
+    const applyMaterial = (object, material) => {
+      if (object.isMesh) {
+        if (
+          ["wireframe", "normals", "matcap", "basecolor", "texture"].includes(
+            viewMode,
+          )
+        ) {
+          if (object.material && object.material.dispose)
+            object.material.dispose();
+          object.material = createMaterial(viewMode, object.geometry);
+        }
+      }
+      if (object.children) {
+        object.children.forEach((child) => applyMaterial(child, material));
+      }
+    };
 
-    // Dispose old material
-    if (oldMaterial && oldMaterial.dispose) {
-      oldMaterial.dispose();
-    }
+    applyMaterial(
+      meshRef.current,
+      createMaterial(viewMode, meshRef.current.geometry),
+    );
   }, [viewMode]);
 
-  // Handle file upload
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -74,7 +84,6 @@ const ThreeDViewer = () => {
     setStats((prev) => ({ ...prev, format: `.glb` }));
 
     try {
-      // Dynamically import GLTFLoader
       const module = await import("three/examples/jsm/loaders/GLTFLoader.js");
       const GLTFLoader = module.GLTFLoader;
       const loader = new GLTFLoader();

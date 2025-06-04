@@ -40,6 +40,18 @@ export const createMaterial = (mode, geometry) => {
     case "normals":
       return new THREE.MeshNormalMaterial();
 
+    case "texture":
+      // If geometry has UVs, use a MeshBasicMaterial with a default texture
+      // Otherwise, fallback to basecolor
+      if (geometry && geometry.attributes && geometry.attributes.uv) {
+        const texture = new THREE.TextureLoader().load(
+          "https://threejs.org/examples/textures/uv_grid_opengl.jpg",
+        );
+        return new THREE.MeshBasicMaterial({ map: texture });
+      } else {
+        return new THREE.MeshLambertMaterial({ color: 0x4e8eed });
+      }
+
     default:
       return new THREE.MeshLambertMaterial({ color: 0x00aa88 });
   }
