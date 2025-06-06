@@ -18,7 +18,8 @@ export const createMatcapTexture = () => {
   return texture;
 };
 
-export const createMaterial = (mode, geometry) => {
+// Accepts an optional texture parameter for texture mode
+export const createMaterial = (mode, geometry, customTexture) => {
   switch (mode) {
     case "wireframe":
       return new THREE.MeshBasicMaterial({
@@ -41,9 +42,10 @@ export const createMaterial = (mode, geometry) => {
       return new THREE.MeshNormalMaterial();
 
     case "texture":
-      // If geometry has UVs, use a MeshBasicMaterial with a default texture
-      // Otherwise, fallback to basecolor
-      if (geometry && geometry.attributes && geometry.attributes.uv) {
+      // Use customTexture if provided, otherwise fallback
+      if (customTexture) {
+        return new THREE.MeshBasicMaterial({ map: customTexture });
+      } else if (geometry && geometry.attributes && geometry.attributes.uv) {
         const texture = new THREE.TextureLoader().load(
           "https://threejs.org/examples/textures/uv_grid_opengl.jpg",
         );

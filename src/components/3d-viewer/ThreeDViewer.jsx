@@ -7,12 +7,16 @@ import SidePanel from "./SidePanel";
 import Loading from "./Loading";
 import ErrorMessage from "./ErrorMessage";
 
+const FALLBACK_TEXTURE_URL =
+  "https://threejs.org/examples/textures/uv_grid_opengl.jpg";
+
 const ThreeDViewer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [viewMode, setViewMode] = useState("basecolor");
   const [isDragging, setIsDragging] = useState(false);
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
+  const [modelTexture, setModelTexture] = useState(null);
 
   const { mountRef, sceneRef, cameraRef, meshRef, stats, setStats } =
     useThreeScene();
@@ -53,7 +57,11 @@ const ThreeDViewer = () => {
         ) {
           if (object.material && object.material.dispose)
             object.material.dispose();
-          object.material = createMaterial(viewMode, object.geometry);
+          object.material = createMaterial(
+            viewMode,
+            object.geometry,
+            viewMode === "texture" ? modelTexture : undefined,
+          );
         }
       }
       if (object.children) {
@@ -63,9 +71,13 @@ const ThreeDViewer = () => {
 
     applyMaterial(
       meshRef.current,
-      createMaterial(viewMode, meshRef.current.geometry),
+      createMaterial(
+        viewMode,
+        meshRef.current.geometry,
+        viewMode === "texture" ? modelTexture : undefined,
+      ),
     );
-  }, [viewMode]);
+  }, [viewMode, modelTexture]);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -101,6 +113,23 @@ const ThreeDViewer = () => {
           const model = gltf.scene.children[0];
           sceneRef.current.add(model);
           meshRef.current = model;
+
+          // Extract texture from the model (first mesh with a map)
+          let foundTexture = null;
+          model.traverse((child) => {
+            if (child.isMesh && child.material && child.material.map) {
+              foundTexture = child.material.map;
+            }
+          });
+          if (foundTexture) {
+            setModelTexture(foundTexture);
+          } else {
+            // Load fallback texture if none found
+            const fallback = new THREE.TextureLoader().load(
+              FALLBACK_TEXTURE_URL,
+            );
+            setModelTexture(fallback);
+          }
 
           // Compute stats
           let triangles = 0,
