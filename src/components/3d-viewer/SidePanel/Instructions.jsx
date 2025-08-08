@@ -1,15 +1,16 @@
-import React from "react";
-
-const Instructions = () => (
-  <div className="mt-6 text-gray-400">
-    <h4 className="mb-2 font-semibold">Controls:</h4>
-    <ul className="list-disc space-y-1 pl-3 text-sm">
-      <li>Click and drag to rotate</li>
-      <li>Use view modes to inspect model</li>
-      <li>Upload your own 3D files</li>
-      <li>Reset camera with button</li>
-    </ul>
-  </div>
-);
-
-export default Instructions;
+export default function Instructions() {
+  return (
+    <>
+      <div className="text-gray-400">
+        <div className="my-1 mt-6 h-[1px] w-full bg-gray-600" />
+        <h4 className="my-2 font-semibold">How to use:</h4>
+        <ul className="list-decimal space-y-1 pl-5 text-xs">
+          <li>Upload your own 3D model.</li>
+          <li>Click and drag to rotate.</li>
+          <li>Use view modes to inspect.</li>
+          <li>Check model info for model details.</li>
+        </ul>
+      </div>
+    </>
+  );
+}
