@@ -4,7 +4,6 @@ import { useThreeScene } from "../hooks/useThreeScene.js";
 import { createMaterial } from "../components/3d-viewer/utils/materials.js";
 import Controls from "../components/3d-viewer/Controls.jsx";
 import SidePanel from "../components/3d-viewer/SidePanel/sidePanel.jsx";
-import ViewModes from "../components/3d-viewer/SidePanel/ViewModes.jsx";
 import Loading from "../components/3d-viewer/Loading.jsx";
 import ErrorMessage from "../components/3d-viewer/ErrorMessage.jsx";
 
@@ -188,8 +187,6 @@ const MainPage = () => {
   return (
     <div className="fixed inset-0 flex overflow-hidden bg-gray-900 text-white">
       <div className="relative flex-1 overflow-hidden">
-        {/* <ViewModes viewMode={viewMode} setViewMode={setViewMode} /> */}
-
         <div
           ref={mountRef}
           className="absolute inset-0 cursor-grab active:cursor-grabbing"

@@ -1,12 +1,12 @@
 import FileUpload from "./FileUpload";
 import ViewModeControls from "./ViewModeControls";
 import ModelInfo from "./ModelInfo";
+import TitlePanel from "./TitlePanel";
 import Instructions from "./Instructions";
 
 const SidePanel = ({ viewMode, setViewMode, stats, onFileUpload }) => (
-  <div className="fixed flex h-dvh w-80 flex-col bg-gray-800 p-6">
-    <h2 className="text-3xl font-bold">Porcelana</h2>
-    <h3 className="mb-6 text-sm font-light">3D model viewer</h3>
+  <div className="bg-midBlack border-corner fixed flex h-dvh w-1/5 flex-col border-r p-6">
+    <TitlePanel />
     <FileUpload onFileUpload={onFileUpload} />
     <ViewModeControls viewMode={viewMode} setViewMode={setViewMode} />
     <ModelInfo stats={stats} />
