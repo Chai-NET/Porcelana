@@ -25,9 +25,25 @@ export default function Title() {
             </h3>
           </div>
         </div>
-        <div className="flex w-13 gap-2 text-zinc-400">
-          <SiGithub className="size-full" />
-          <LuInfo className="size-full" />
+        <div className="flex w-13 gap-2 text-zinc-400 2xl:w-16">
+          {/* Will replace with actual repository link */}
+          <a
+            rel="noreferrer"
+            target="_blank"
+            className="size-full"
+            href="https://github.com/plwtx"
+          >
+            <SiGithub className="size-full" />
+          </a>
+          {/* Will replace with information page */}
+          <a
+            rel="noreferrer"
+            target="_blank"
+            className="size-full"
+            href="https://github.com/Chai-NET"
+          >
+            <LuInfo className="size-full" />
+          </a>
         </div>
       </div>
     </>

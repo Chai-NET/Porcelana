@@ -135,10 +135,10 @@
   --font-mozilla: "Mozilla Text", sans-serif;
 
   /* Colors */
-  --color-corner: #444444;
+  --color-dark44: #444444;
   --color-bg: #282424;
   --color-accent: #869fef;
-  --color-midBlack: #252525;
+  --color-dark25: #252525;
   --color-darkBlack: #0a0a0a;
 }
 
