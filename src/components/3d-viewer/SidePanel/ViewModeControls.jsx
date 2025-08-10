@@ -2,10 +2,10 @@ import { Eye } from "lucide-react";
 
 const ViewModeControls = ({ viewMode, setViewMode }) => (
   <div className="mb-6">
-    <label className="font-Poppins mb-3 block text-lg font-semibold">
-      View Mode
+    <label className="font-Poppins mb-3 block text-sm font-semibold">
+      View modes
     </label>
-    <div className="grid grid-cols-2 gap-3">
+    <div className="flex justify-between gap-1 2xl:gap-3">
       {[
         { key: "wireframe", label: "Wireframe" },
         { key: "matcap", label: "Matcap" },
@@ -17,14 +17,14 @@ const ViewModeControls = ({ viewMode, setViewMode }) => (
         <button
           key={key}
           onClick={() => setViewMode(key)}
-          className={`flex w-full justify-between rounded p-3 text-left text-sm text-nowrap transition-colors ${
+          className={`rounded-xl border-2 p-3 text-left text-sm text-nowrap transition-colors md:p-4 2xl:p-5 ${
             viewMode === key
-              ? "bg-accent text-white"
-              : "bg-zinc-700 text-zinc-300 hover:bg-gray-600"
+              ? "border-accent text-white"
+              : "border-zinc-600 bg-zinc-700 text-zinc-300 hover:bg-gray-600"
           }`}
         >
-          {label}
-          <Eye size={16} className="mr-3 inline" />
+          {/* {label} */}
+          <Eye size={16} className="inline" />
         </button>
       ))}
     </div>

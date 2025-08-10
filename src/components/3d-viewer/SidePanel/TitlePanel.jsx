@@ -5,20 +5,22 @@ import { LuRotate3D, LuInfo } from "react-icons/lu";
 export default function Title() {
   return (
     <>
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-3 flex items-start justify-between 2xl:mb-6">
         <div className="flex w-full items-center gap-3">
           <div className="flex">
-            <LuRotate3D className="stroke-accent size-12 fill-white" />
-            <p className="text-xs">&#169;</p>
+            <LuRotate3D className="stroke-accent size-9 fill-white 2xl:size-12" />
+            <p className="invisible absolute text-xs xl:visible xl:relative">
+              &#169;
+            </p>
           </div>
-          <div className="h-16 w-[3px] rounded-full bg-zinc-400" />
+          <div className="h-9 w-[3px] rounded-full bg-zinc-400 2xl:h-12" />
           <div>
             <img
               src={LogoTitle}
-              className="w-32"
+              className="w-24 2xl:w-26"
               alt="Porcelana (Korean: P-Ceramic)"
             />
-            <h3 className="font-jost text-sm font-semibold text-zinc-300">
+            <h3 className="font-jost mt-1 text-xs font-semibold text-zinc-300">
               3D model viewer
             </h3>
           </div>

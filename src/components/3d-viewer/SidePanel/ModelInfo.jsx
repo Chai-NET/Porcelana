@@ -3,9 +3,9 @@ import { IoCubeOutline } from "react-icons/io5";
 
 const ModelInfo = ({ stats }) => (
   <div className="border-corner shadow-darkBlack rounded-lg border bg-zinc-700/30 p-4 shadow">
-    <h3 className="font-jost my-3 mb-6 text-2xl font-semibold">Model Info</h3>
+    <h3 className="font-jost my-3 mb-6 text-xl font-semibold">Model Info</h3>
 
-    <div className="space-y-3 px-1">
+    <div className="space-y-2 px-1 2xl:space-y-3">
       {/* Name */}
       <div className="flex items-center justify-between">
         <span className="text-gray-300">Name:</span>
