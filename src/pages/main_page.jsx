@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import * as THREE from "three";
-import { useThreeScene } from "../hooks/useThreeScene.js";
+import { TDSpace } from "../hooks/3D_space.js";
 import { createMaterial } from "../components/3d-viewer/utils/materials.js";
 import Controls from "../components/3d-viewer/Controls.jsx";
 import SidePanel from "../components/3d-viewer/SidePanel/sidePanel.jsx";
@@ -18,8 +18,7 @@ const MainPage = () => {
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
   const [modelTexture, setModelTexture] = useState(null);
 
-  const { mountRef, sceneRef, cameraRef, meshRef, stats, setStats } =
-    useThreeScene();
+  const { mountRef, sceneRef, cameraRef, meshRef, stats, setStats } = TDSpace();
 
   const handleMouseDown = useCallback((e) => {
     setIsDragging(true);

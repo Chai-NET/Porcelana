@@ -23,7 +23,7 @@ export const createMaterial = (mode, geometry, customTexture) => {
   switch (mode) {
     case "wireframe":
       return new THREE.MeshBasicMaterial({
-        color: 0x0000ff,
+        color: 0x444444,
         wireframe: true,
       });
 
@@ -35,7 +35,7 @@ export const createMaterial = (mode, geometry, customTexture) => {
 
     case "basecolor":
       return new THREE.MeshLambertMaterial({
-        color: 0x4e8eed,
+        color: 0x869fef,
       });
 
     case "normals":

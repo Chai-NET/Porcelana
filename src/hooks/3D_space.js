@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { createMaterial } from "../components/3d-viewer/utils/materials";
 
-export const useThreeScene = () => {
+export const TDSpace = () => {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);
