@@ -1,14 +1,18 @@
-![Porcelana Logo](/README_files/logoTitle.svg)
-### Porcelana
+<img src="/README_files/logoTitle.svg" alt="Porcelana logo" width="200" height="200">
+
+## Porcelana
 ##### © 2025 | ChaiNET FOSS Project | chainet.dev | Developed and maintained by [Pluwia ad Astra | ChaiNET](https://github.com/plwtx). | [plu.moe](https://plu.moe).
 
-![Screenshot of user interface](/README_files/screenShot.png)
 
 A free, open-source web application for uploading and viewing 3D models in your browser.
 
 - Upload and interact with your 3D models.
 - Switch between view modes (solid, wireframe, etc.).
 - View model stats: vertex/triangle counts and etc.
+
+###### UI of the applicaiton:
+
+![Screenshot of user interface](/README_files/screenShot.png)
 
 Feel free to modify and distribute versions of app.
 If you want to run it locally or modify it:
