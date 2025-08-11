@@ -1,6 +1,8 @@
+![Porcelana Logo](/README_files/logoTitle.svg)
 ### Porcelana
-
 ##### © 2025 | ChaiNET FOSS Project | chainet.dev | Developed and maintained by [Pluwia ad Astra | ChaiNET](https://github.com/plwtx). | [plu.moe](https://plu.moe).
+
+![Screenshot of user interface](/README_files/screenShot.png)
 
 A free, open-source web application for uploading and viewing 3D models in your browser.
 
