@@ -49,7 +49,7 @@ export default function Title() {
               alt="Porcelana (Korean: P-Ceramic)"
             />
             <h3 className="font-jost mt-1 text-xs font-semibold text-zinc-300">
-              3D model viewer
+              3D model web inspector
             </h3>
           </div>
         </div>

@@ -18,7 +18,7 @@ const ModelInfo = ({ stats }) => (
       {/* View mode */}
       <div className="flex items-center justify-between">
         <span className="text-gray-300">View mode:</span>
-        <span className="font-mono">Wireframe</span>
+        <span className="font-mono">Base</span>
       </div>
 
       {/* View mode */}

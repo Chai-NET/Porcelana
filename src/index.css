@@ -157,7 +157,7 @@
   }
 }
 .animate-fadeIn {
-  animation: fadeIn 0.25s ease-out forwards;
+  animation: fadeIn 0.45s ease-out forwards;
 }
 
 /* Scrollbar styles remain unchanged */
