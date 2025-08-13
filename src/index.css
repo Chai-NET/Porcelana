@@ -144,6 +144,22 @@
   --color-darkBlack: #0a0a0a;
 }
 
+/* Animations */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
 /* Scrollbar styles remain unchanged */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;

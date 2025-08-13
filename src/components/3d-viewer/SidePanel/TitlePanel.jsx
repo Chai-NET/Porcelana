@@ -1,8 +1,36 @@
+import { useState, useEffect, useRef } from "react";
 import LogoTitle from "../../../assets/logoTitle.svg";
+import InfoBox from "../../infoBox.jsx";
 import { SiGithub } from "react-icons/si";
 import { LuRotate3D, LuInfo } from "react-icons/lu";
 
 export default function Title() {
+  const [open, setOpen] = useState(false);
+  const boxRef = useRef(null);
+
+  // ESC to close
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
+  // Outside click to close
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e) => {
+      if (boxRef.current && !boxRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
   return (
     <>
       <div className="mb-3 flex items-start justify-between 2xl:mb-6">
@@ -26,24 +54,36 @@ export default function Title() {
           </div>
         </div>
         <div className="flex w-13 gap-2 text-zinc-400 2xl:w-16">
-          {/* Will replace with actual repository link */}
           <a
             rel="noreferrer"
             target="_blank"
             className="size-full"
-            href="https://github.com/plwtx"
+            href="https://github.com/Chai-NET/Porcelana"
           >
             <SiGithub className="size-full" />
           </a>
-          {/* Will replace with information page */}
-          <a
-            rel="noreferrer"
-            target="_blank"
-            className="size-full"
-            href="https://github.com/Chai-NET"
-          >
-            <LuInfo className="size-full" />
-          </a>
+
+          {/* Button */}
+          <button onClick={() => setOpen(true)} className="size-full">
+            <LuInfo className="size-full cursor-pointer" />
+          </button>
+
+          {/* Blur background */}
+          {open && (
+            <div
+              onClick={() => setOpen(false)}
+              className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+            />
+          )}
+
+          {/* Info box */}
+          {open && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div ref={boxRef} className="animate-fadeIn">
+                <InfoBox />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
