@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from "react";
 import * as THREE from "three";
-import { TDSpace } from "../hooks/3D_space.js";
+import { TDSpace } from "../hooks/3D_space.jsx";
 import { createMaterial } from "../components/3d-viewer/utils/materials.js";
 import Controls from "../components/3d-viewer/Controls.jsx";
 import SidePanel from "../components/3d-viewer/SidePanel/sidePanel.jsx";
 import Loading from "../components/3d-viewer/Loading.jsx";
 import ErrorMessage from "../components/3d-viewer/ErrorMessage.jsx";
+import ZoomIndicator from "../components/3d-viewer/ZoomIndicator.jsx";
 
 const FALLBACK_TEXTURE_URL =
   "https://threejs.org/examples/textures/uv_grid_opengl.jpg";
@@ -18,7 +19,18 @@ const MainPage = () => {
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
   const [modelTexture, setModelTexture] = useState(null);
 
-  const { mountRef, sceneRef, cameraRef, meshRef, stats, setStats } = TDSpace();
+  const {
+    mountRef,
+    sceneRef,
+    cameraRef,
+    meshRef,
+    stats,
+    setStats,
+    zoomLevel,
+    resetCamera,
+    replaceModel,
+    setIsDefaultCube,
+  } = TDSpace();
 
   const handleMouseDown = useCallback((e) => {
     setIsDragging(true);
@@ -99,27 +111,21 @@ const MainPage = () => {
       const GLTFLoader = module.GLTFLoader;
       const loader = new GLTFLoader();
       const url = URL.createObjectURL(file);
+
       loader.load(
         url,
         (gltf) => {
-          // Remove old mesh
-          if (meshRef.current) {
-            sceneRef.current.remove(meshRef.current);
-            if (meshRef.current.geometry) meshRef.current.geometry.dispose();
-            if (meshRef.current.material) meshRef.current.material.dispose();
-          }
-          // Add new mesh (first scene child)
-          const model = gltf.scene.children[0];
-          sceneRef.current.add(model);
-          meshRef.current = model;
+          // Replace the current model with the uploaded
+          const model = gltf.scene;
+          replaceModel(model);
 
-          // Extract texture from the model (first mesh with a map)
           let foundTexture = null;
           model.traverse((child) => {
             if (child.isMesh && child.material && child.material.map) {
               foundTexture = child.material.map;
             }
           });
+
           if (foundTexture) {
             setModelTexture(foundTexture);
           } else {
@@ -141,11 +147,14 @@ const MainPage = () => {
               vertices += child.geometry.attributes.position.count;
             }
           });
+
           setStats({
             triangles: Math.floor(triangles),
             vertices: vertices,
             format: `.glb`,
           });
+
+          setIsLoading(false);
           URL.revokeObjectURL(url);
         },
         undefined,
@@ -153,22 +162,13 @@ const MainPage = () => {
           setError("Failed to load GLB model. Please try a different file.");
           setIsLoading(false);
           URL.revokeObjectURL(url);
+          console.error("Error loading GLB:", err);
         },
       );
     } catch (err) {
       setError("Failed to load 3D model. Please try a different file.");
-      console.error("Error loading file:", err);
-    } finally {
       setIsLoading(false);
-    }
-  };
-
-  // Reset camera
-  const resetCamera = () => {
-    if (cameraRef.current && meshRef.current) {
-      cameraRef.current.position.set(0, 0, 5);
-      cameraRef.current.lookAt(0, 0, 0);
-      meshRef.current.rotation.set(0, 0, 0);
+      console.error("Error loading file:", err);
     }
   };
 
@@ -194,6 +194,9 @@ const MainPage = () => {
         <Loading isLoading={isLoading} />
         <ErrorMessage error={error} />
         <Controls onReset={resetCamera} />
+
+        {/* Zoom Indicator*/}
+        {!isLoading && !error && <ZoomIndicator zoomLevel={zoomLevel} />}
       </div>
       <SidePanel
         viewMode={viewMode}

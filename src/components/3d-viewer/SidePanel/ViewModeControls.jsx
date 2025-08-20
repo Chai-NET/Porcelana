@@ -1,5 +1,4 @@
 import { Eye } from "lucide-react";
-import { div } from "three/tsl";
 
 const ViewModeControls = ({ viewMode, setViewMode }) => (
   <div className="border-dark44 relative mb-6 h-36 min-h-35 w-full rounded-2xl rounded-b-lg border">
