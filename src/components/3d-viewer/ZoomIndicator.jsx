@@ -2,7 +2,7 @@ const ZoomIndicator = ({ zoomLevel }) => {
   const progressPercentage = ((zoomLevel - 100) / (200 - 100)) * 100;
 
   return (
-    <div className="absolute right-3 bottom-3 z-10">
+    <div className="absolute right-3 bottom-3">
       <div className="bg-dark25 border-dark44 rounded-lg border px-4 py-3 backdrop-blur-sm">
         <div className="flex min-w-[200px] items-center space-x-3">
           {/* Zoom percentage display */}

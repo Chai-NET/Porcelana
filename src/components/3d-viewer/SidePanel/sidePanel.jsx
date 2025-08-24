@@ -4,7 +4,7 @@ import ModelInfo from "./ModelInfo";
 import TitlePanel from "./TitlePanel";
 
 const SidePanel = ({ viewMode, setViewMode, stats, onFileUpload }) => (
-  <div className="border-dark44 from-dark25 fixed flex h-dvh flex-col justify-start gap-6 border-r bg-gradient-to-b from-35% to-[#2C2C2C] p-6 md:w-100 2xl:w-100">
+  <div className="border-dark44 from-dark25/45 absolute top-0 left-0 flex h-dvh flex-col justify-start gap-6 border-r bg-gradient-to-b from-35% to-[#2C2C2C] p-6 backdrop-blur-3xl md:w-100 2xl:w-100">
     <TitlePanel />
     <FileUpload onFileUpload={onFileUpload} />
     <ViewModeControls viewMode={viewMode} setViewMode={setViewMode} />

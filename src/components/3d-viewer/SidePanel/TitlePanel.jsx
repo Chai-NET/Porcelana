@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import LogoTitle from "../../../assets/logoTitle.svg";
 import InfoBox from "../../infoBox.jsx";
 import { SiGithub } from "react-icons/si";
@@ -31,6 +32,7 @@ export default function Title() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
+
   return (
     <>
       <div className="mb-3 flex items-start justify-between 2xl:mb-6">
@@ -53,39 +55,39 @@ export default function Title() {
             </h3>
           </div>
         </div>
-        <div className="flex w-13 gap-2 text-zinc-400 2xl:w-16">
+        <div className="flex w-20 gap-2 text-zinc-400 2xl:w-24">
           <a
             rel="noreferrer"
             target="_blank"
             className="size-full"
             href="https://github.com/Chai-NET/Porcelana"
           >
-            <SiGithub className="size-full" />
+            <SiGithub className="hover:text-accent hover:border-accent size-full cursor-pointer rounded-full border border-transparent p-1 transition-colors duration-600 ease-in-out" />
           </a>
 
           {/* Button */}
           <button onClick={() => setOpen(true)} className="size-full">
-            <LuInfo className="size-full cursor-pointer" />
+            <LuInfo className="hover:text-accent hover:border-accent size-full cursor-pointer rounded-full border border-transparent p-1 transition-colors duration-600 ease-in-out" />
           </button>
-
-          {/* Blur background */}
-          {open && (
-            <div
-              onClick={() => setOpen(false)}
-              className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
-            />
-          )}
-
-          {/* Info box */}
-          {open && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center">
-              <div ref={boxRef} className="animate-fadeIn">
-                <InfoBox />
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Modal rendered using Portal to escape the parent container */}
+      {open && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+          {/* Blur background */}
+          <div
+            onClick={() => setOpen(false)}
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+          />
+          
+          {/* Info box */}
+          <div ref={boxRef} className="relative z-10 animate-fadeIn">
+            <InfoBox />
+          </div>
+        </div>,
+        document.body
+      )}
     </>
   );
 }

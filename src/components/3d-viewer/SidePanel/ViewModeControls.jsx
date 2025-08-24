@@ -1,4 +1,4 @@
-import { Eye } from "lucide-react";
+import { Eye, EyeClosed } from "lucide-react";
 
 const ViewModeControls = ({ viewMode, setViewMode }) => (
   <div className="border-dark44 relative mb-6 h-36 min-h-35 w-full rounded-2xl rounded-b-lg border">
@@ -48,7 +48,11 @@ const ViewModeControls = ({ viewMode, setViewMode }) => (
               }`}
             >
               {/* {label} */}
-              <Eye size={20} className="inline" />
+              {viewMode === key ? (
+                <Eye size={20} className="inline" />
+              ) : (
+                <EyeClosed size={20} className="inline" />
+              )}
             </button>
           </div>
         ))}
