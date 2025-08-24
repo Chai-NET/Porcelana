@@ -72,22 +72,23 @@ export default function Title() {
         </div>
       </div>
 
-      {/* Modal rendered using Portal to escape the parent container */}
-      {open && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-          {/* Blur background */}
-          <div
-            onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
-          />
-          
-          {/* Info box */}
-          <div ref={boxRef} className="relative z-10 animate-fadeIn">
-            <InfoBox />
-          </div>
-        </div>,
-        document.body
-      )}
+      {/* Modal: Portal for leaving the parent container */}
+      {open &&
+        createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+            {/* Blur background */}
+            <div
+              onClick={() => setOpen(false)}
+              className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            />
+
+            {/* Info box */}
+            <div ref={boxRef} className="animate-fadeIn relative z-10">
+              <InfoBox />
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

@@ -4,7 +4,7 @@ import { SiGithub, SiLinkedin, SiBluesky, SiInstagram } from "react-icons/si";
 
 export default function InfoBox() {
   return (
-    <div className="border-dark44 selection:text-dark25 font-jost from-dark25/45 shadow-dark25 w-[90vw] max-w-[680px] flex-col justify-start gap-6 rounded-2xl border bg-gradient-to-b from-35% to-[#2C2C2C]/65 p-8 text-zinc-300 shadow-lg backdrop-blur-2xl selection:bg-white md:p-12">
+    <div className="border-dark44 selection:text-dark25 font-jost from-dark25/85 shadow-dark25 w-[90vw] max-w-[680px] flex-col justify-start gap-6 rounded-2xl border bg-gradient-to-b from-35% to-[#2C2C2C]/75 p-8 text-zinc-300 shadow-lg backdrop-blur-3xl selection:bg-white md:p-12">
       <p className="py-3 text-start text-lg leading-6 text-zinc-50">
         A free, open-source web application for uploading and viewing 3D models
         in your browser. Allowing you to upload your .glb formatted models and
