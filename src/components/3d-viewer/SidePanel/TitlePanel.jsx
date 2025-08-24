@@ -9,7 +9,6 @@ export default function Title() {
   const [open, setOpen] = useState(false);
   const boxRef = useRef(null);
 
-  // ESC to close
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e) => {

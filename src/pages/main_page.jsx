@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import * as THREE from "three";
 import { TDSpace } from "../hooks/3D_space.jsx";
 import { createMaterial } from "../components/3d-viewer/utils/materials.js";
@@ -7,6 +7,7 @@ import SidePanel from "../components/3d-viewer/SidePanel/sidePanel.jsx";
 import Loading from "../components/3d-viewer/Loading.jsx";
 import ErrorMessage from "../components/3d-viewer/ErrorMessage.jsx";
 import ZoomIndicator from "../components/3d-viewer/ZoomIndicator.jsx";
+import ScreenAlert from "../components/3d-viewer/ScreenAlert.jsx";
 
 const FALLBACK_TEXTURE_URL =
   "https://threejs.org/examples/textures/uv_grid_opengl.jpg";
@@ -19,17 +20,33 @@ const MainPage = () => {
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
   const [modelTexture, setModelTexture] = useState(null);
 
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const screenWidth = window.innerWidth;
+      if (screenWidth < 1250) {
+        setIsSmallScreen(true);
+      } else {
+        setIsSmallScreen(false);
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const {
     mountRef,
-    sceneRef,
-    cameraRef,
     meshRef,
     stats,
     setStats,
     zoomLevel,
     resetCamera,
     replaceModel,
-    setIsDefaultCube,
   } = TDSpace();
 
   const handleMouseDown = useCallback((e) => {
@@ -192,10 +209,15 @@ const MainPage = () => {
           onMouseDown={handleMouseDown}
         />
         <Loading isLoading={isLoading} />
+
+        <div
+          className={`z-50 transition-all duration-500 ${isSmallScreen ? "opacity-100" : "opacity-0"}`}
+        >
+          <ScreenAlert isSmallScreen={isSmallScreen} />
+        </div>
         <ErrorMessage error={error} />
         <Controls onReset={resetCamera} />
 
-        {/* Zoom Indicator*/}
         {!isLoading && !error && <ZoomIndicator zoomLevel={zoomLevel} />}
       </div>
       <SidePanel

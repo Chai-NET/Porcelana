@@ -41,10 +41,10 @@ const ViewModeControls = ({ viewMode, setViewMode }) => (
             <button
               key={key}
               onClick={() => setViewMode(key)}
-              className={`shadow-darkBlack from-dark25 to-dark35 relative size-12 cursor-pointer overflow-clip rounded-lg border-2 from-10% p-3 text-left text-sm text-nowrap transition-all duration-300 ease-in-out ${
+              className={`shadow-darkBlack from-dark25 group to-dark35 relative size-12 cursor-pointer overflow-clip rounded-lg border-2 from-10% p-3 text-left text-sm text-nowrap transition-all duration-300 ease-in-out ${
                 viewMode === key
                   ? "border-accent bg-gradient-to-bl text-white shadow-inner"
-                  : "border-dark44 bg-gradient-to-tl text-zinc-300 hover:bg-zinc-100"
+                  : "border-dark44 hover:border-accent/50 bg-gradient-to-tl text-zinc-300 hover:bg-zinc-100"
               }`}
             >
               {/* {label} */}
@@ -63,7 +63,7 @@ const ViewModeControls = ({ viewMode, setViewMode }) => (
                   className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 stroke-white transition-all delay-75 duration-1000 ease-out ${
                     viewMode === key
                       ? "-translate-y-3 rotate-x-180 opacity-0"
-                      : "rotate-0 opacity-100"
+                      : "rotate-0 opacity-100 group-hover:size-6"
                   } `}
                 />
               </div>
