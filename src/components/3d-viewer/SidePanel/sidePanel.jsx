@@ -11,7 +11,7 @@ const SidePanel = ({ viewMode, setViewMode, stats, onFileUpload }) => {
   useEffect(() => {
     const handleResize = () => {
       const screenWidth = window.innerWidth;
-      if (screenWidth < 1000) {
+      if (screenWidth < 1150) {
         setIsCollapsed(true);
       } else {
         setIsCollapsed(false);

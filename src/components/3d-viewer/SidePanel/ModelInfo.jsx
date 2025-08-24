@@ -11,20 +11,26 @@ const ModelInfo = ({ stats }) => (
         <span className="text-gray-300">Name:</span>
         <div className="text-accent flex items-center gap-1">
           <IoCubeOutline />
-          <span className="font-mono">cube</span>
+          <span className="font-mono">
+            {stats.fileName ? stats.fileName : "Cube"}
+          </span>
         </div>
       </div>
 
-      {/* View mode */}
-      <div className="flex items-center justify-between">
-        <span className="text-gray-300">View mode:</span>
-        <span className="font-mono">Base</span>
-      </div>
+      {/* Material */}
+      {/* <div className="flex items-center justify-between">
+        <span className="text-gray-300">Material:</span>
+        <span className="font-mono">
+          {stats.materialAnalysis.materialCount}
+        </span>
+      </div> */}
 
-      {/* View mode */}
+      {/* File Size */}
       <div className="flex items-center justify-between">
-        <span className="text-gray-300">PBR material:</span>
-        <span className="font-mono">NA</span>
+        <span className="text-gray-300">File size:</span>
+        <span className="font-mono">
+          {stats.fileSizeMB ? stats.fileSizeMB + " MB" : "N/A (Default cube)"}
+        </span>
       </div>
 
       {/* Format */}
