@@ -13,12 +13,12 @@ export const TDSpace = () => {
     isZooming: false,
     initialDistance: 5,
     currentDistance: 5,
-    minDistance: 2.5, //
-    maxDistance: 10, //
+    minDistance: 2.5,
+    maxDistance: 10,
   });
 
   const [stats, setStats] = useState({ triangles: 0, vertices: 0, format: "" });
-  const [zoomLevel, setZoomLevel] = useState(100); // 100% = no zoom, 200% = 2x zoom
+  const [zoomLevel, setZoomLevel] = useState(100);
   const [isDefaultCube, setIsDefaultCube] = useState(true);
 
   const calculateZoomPercentage = useCallback((distance) => {
@@ -27,19 +27,13 @@ export const TDSpace = () => {
     return Math.round(Math.max(100, Math.min(200, zoomFactor * 100)));
   }, []);
 
-  // Center and scale model to fit in view
   const centerAndScaleModel = useCallback((object) => {
     if (!object) return;
 
-    // Create bounding box
     const box = new THREE.Box3().setFromObject(object);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
 
-    // Center the object
-    object.position.sub(center);
-
-    // Scale to fit in view (3)
     const maxDimension = Math.max(size.x, size.y, size.z);
     if (maxDimension > 0) {
       const targetSize = 3.5;
@@ -47,11 +41,14 @@ export const TDSpace = () => {
       object.scale.setScalar(scaleFactor);
     }
 
-    // Reset rotation to show model according to 3D space
+    box.setFromObject(object);
+    box.getCenter(center);
+
+    object.position.set(-center.x, -center.y, -center.z);
+
     object.rotation.set(0, 0, 0);
   }, []);
 
-  // Handle wheel zoom
   const handleWheel = useCallback(
     (event) => {
       event.preventDefault();
@@ -60,7 +57,6 @@ export const TDSpace = () => {
       const zoomSpeed = 0.1;
       const delta = event.deltaY * 0.001 * zoomSpeed;
 
-      // Update camera distance
       const newDistance = Math.max(
         minDistance,
         Math.min(maxDistance, controlsRef.current.currentDistance + delta),
@@ -70,13 +66,13 @@ export const TDSpace = () => {
 
       if (cameraRef.current) {
         cameraRef.current.position.setLength(newDistance);
+        cameraRef.current.lookAt(0, 0, 0);
         setZoomLevel(calculateZoomPercentage(newDistance));
       }
     },
     [calculateZoomPercentage],
   );
 
-  // Initialize the 3D scene
   useEffect(() => {
     if (!mountRef.current) return;
 
@@ -85,6 +81,7 @@ export const TDSpace = () => {
 
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
     camera.position.set(0, 0, controlsRef.current.initialDistance);
+    camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -93,20 +90,30 @@ export const TDSpace = () => {
 
     const updateSize = () => {
       if (!mountRef.current) return;
-      const width = mountRef.current.clientWidth;
-      const height = mountRef.current.clientHeight;
 
+      const rect = mountRef.current.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+
+      // Update camera aspect ratio
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
 
       renderer.setSize(width, height, false);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      camera.lookAt(0, 0, 0);
     };
 
     renderer.domElement.style.display = "block";
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
     mountRef.current.innerHTML = "";
     mountRef.current.appendChild(renderer.domElement);
+
     updateSize();
+
+    setTimeout(() => updateSize(), 100);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
@@ -123,24 +130,20 @@ export const TDSpace = () => {
     rendererRef.current = renderer;
     cameraRef.current = camera;
 
-    // Default geometry (cube)
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = createMaterial("basecolor", geometry);
     const mesh = new THREE.Mesh(geometry, material);
 
-    // Center the default cube
     centerAndScaleModel(mesh);
     scene.add(mesh);
     meshRef.current = mesh;
 
-    // Update stats for default cube
     setStats({
       triangles: geometry.attributes.position.count / 3,
       vertices: geometry.attributes.position.count,
       format: "Default Cube",
     });
 
-    // Animation loop
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
 
@@ -153,14 +156,22 @@ export const TDSpace = () => {
     };
     animate();
 
-    // Event listeners
     const canvas = renderer.domElement;
     canvas.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("resize", updateSize);
 
+    const resizeObserver = new ResizeObserver(() => {
+      updateSize();
+    });
+
+    if (mountRef.current) {
+      resizeObserver.observe(mountRef.current);
+    }
+
     return () => {
       canvas.removeEventListener("wheel", handleWheel);
       window.removeEventListener("resize", updateSize);
+      resizeObserver.disconnect();
 
       if (frameRef.current) {
         cancelAnimationFrame(frameRef.current);
@@ -182,9 +193,8 @@ export const TDSpace = () => {
         }
       });
     };
-  }, []);
+  }, [centerAndScaleModel, handleWheel, isDefaultCube]);
 
-  // Reset camera position
   const resetCamera = useCallback(() => {
     if (cameraRef.current && meshRef.current) {
       controlsRef.current.currentDistance = controlsRef.current.initialDistance;
@@ -194,16 +204,13 @@ export const TDSpace = () => {
     }
   }, []);
 
-  // Replace the current model with uploaded.
   const replaceModel = useCallback(
     (newModel) => {
       if (!sceneRef.current || !newModel) return;
 
-      // Remove current model
       if (meshRef.current) {
         sceneRef.current.remove(meshRef.current);
 
-        // Dispose of old model resources
         meshRef.current.traverse((child) => {
           if (child.geometry) {
             child.geometry.dispose();
@@ -233,10 +240,8 @@ export const TDSpace = () => {
       sceneRef.current.add(newModel);
       meshRef.current = newModel;
 
-      // Auto-rotation boolean
       setIsDefaultCube(false);
 
-      // Centering and scaling
       centerAndScaleModel(newModel);
       resetCamera();
     },
