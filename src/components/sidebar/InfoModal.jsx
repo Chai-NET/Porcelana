@@ -1,8 +1,8 @@
-import LogoTitle from "../assets/logoTitle.svg";
-import ChaiNET_logo from "../assets/ChaiNET_logo.svg";
+import LogoTitle from "../../assets/logoTitle.svg";
+import ChaiNET_logo from "../../assets/ChaiNET_logo.svg";
 import { SiGithub, SiLinkedin, SiBluesky, SiInstagram } from "react-icons/si";
 
-export default function InfoBox() {
+export default function InfoModal() {
   return (
     <div className="border-dark44 selection:text-dark25 font-jost from-dark25/85 shadow-dark25 w-[90vw] max-w-[680px] flex-col justify-start gap-6 rounded-2xl border bg-gradient-to-b from-35% to-[#2C2C2C]/75 p-8 text-zinc-300 shadow-lg backdrop-blur-3xl selection:bg-white md:p-12">
       <p className="py-3 text-start text-lg leading-6 text-zinc-50">
@@ -70,8 +70,6 @@ export default function InfoBox() {
 
       <div className="mx-auto h-[1px] w-full bg-zinc-300" />
 
-      {/* Contacts: plu.moe */}
-      {/* Socials: Github, Website(ChaiNET) */}
       <div className="mt-2 flex items-end justify-between px-1">
         <p className="text-start text-sm">
           © 2025 | ChaiNET FOSS Project | chainet.dev

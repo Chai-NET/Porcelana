@@ -1,4 +1,4 @@
-import { formatNumber } from "../utils/formatters";
+import { formatNumber } from "../../lib/formatters";
 import { IoCubeOutline } from "react-icons/io5";
 
 const ModelInfo = ({ stats }) => (
@@ -16,14 +16,6 @@ const ModelInfo = ({ stats }) => (
           </span>
         </div>
       </div>
-
-      {/* Material */}
-      {/* <div className="flex items-center justify-between">
-        <span className="text-gray-300">Material:</span>
-        <span className="font-mono">
-          {stats.materialAnalysis.materialCount}
-        </span>
-      </div> */}
 
       {/* File Size */}
       <div className="flex items-center justify-between">
@@ -46,6 +38,7 @@ const ModelInfo = ({ stats }) => (
           {formatNumber(stats.triangles)}
         </span>
       </div>
+
       {/* Vertices */}
       <div className="flex items-center justify-between">
         <span className="text-gray-300">Vertices:</span>

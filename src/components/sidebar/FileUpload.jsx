@@ -30,17 +30,9 @@ const FileUpload = ({ onFileUpload }) => {
 
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
-      const syntheticEvent = {
-        target: {
-          files: files,
-        },
-      };
+      const syntheticEvent = { target: { files: files } };
       onFileUpload(syntheticEvent);
     }
-  };
-
-  const handleFileInputChange = (e) => {
-    onFileUpload(e);
   };
 
   return (
@@ -80,7 +72,7 @@ const FileUpload = ({ onFileUpload }) => {
           type="file"
           className="hidden"
           accept=".glb"
-          onChange={handleFileInputChange}
+          onChange={onFileUpload}
         />
       </label>
     </div>

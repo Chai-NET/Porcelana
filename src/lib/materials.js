@@ -18,7 +18,6 @@ export const createMatcapTexture = () => {
   return texture;
 };
 
-// Accepts an optional texture parameter for texture mode
 export const createMaterial = (mode, geometry, customTexture) => {
   switch (mode) {
     case "wireframe":
@@ -42,7 +41,6 @@ export const createMaterial = (mode, geometry, customTexture) => {
       return new THREE.MeshNormalMaterial();
 
     case "texture":
-      // Use customTexture if provided, otherwise fallback
       if (customTexture) {
         return new THREE.MeshBasicMaterial({ map: customTexture });
       } else if (geometry && geometry.attributes && geometry.attributes.uv) {

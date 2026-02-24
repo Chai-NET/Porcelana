@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import * as THREE from "three";
-import { createMaterial } from "../components/3d-viewer/utils/materials";
+import { createMaterial } from "../lib/materials";
 
-export const TDSpace = () => {
+export const useThreeScene = () => {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);
@@ -17,7 +17,6 @@ export const TDSpace = () => {
     maxDistance: 10,
   });
 
-  const [stats, setStats] = useState({ triangles: 0, vertices: 0, format: "" });
   const [zoomLevel, setZoomLevel] = useState(100);
   const [isDefaultCube, setIsDefaultCube] = useState(true);
 
@@ -43,9 +42,7 @@ export const TDSpace = () => {
 
     box.setFromObject(object);
     box.getCenter(center);
-
     object.position.set(-center.x, -center.y, -center.z);
-
     object.rotation.set(0, 0, 0);
   }, []);
 
@@ -95,7 +92,6 @@ export const TDSpace = () => {
       const width = rect.width;
       const height = rect.height;
 
-      // Update camera aspect ratio
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
 
@@ -112,7 +108,6 @@ export const TDSpace = () => {
     mountRef.current.appendChild(renderer.domElement);
 
     updateSize();
-
     setTimeout(() => updateSize(), 100);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -138,16 +133,9 @@ export const TDSpace = () => {
     scene.add(mesh);
     meshRef.current = mesh;
 
-    setStats({
-      triangles: geometry.attributes.position.count / 3,
-      vertices: geometry.attributes.position.count,
-      format: "Default Cube",
-    });
-
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
 
-      // Auto-rotate the default cube
       if (meshRef.current && isDefaultCube) {
         meshRef.current.rotation.y += 0.003;
       }
@@ -186,7 +174,7 @@ export const TDSpace = () => {
         if (object.geometry) object.geometry.dispose();
         if (object.material) {
           if (Array.isArray(object.material)) {
-            object.material.forEach((material) => material.dispose());
+            object.material.forEach((mat) => mat.dispose());
           } else {
             object.material.dispose();
           }
@@ -239,9 +227,7 @@ export const TDSpace = () => {
 
       sceneRef.current.add(newModel);
       meshRef.current = newModel;
-
       setIsDefaultCube(false);
-
       centerAndScaleModel(newModel);
       resetCamera();
     },
@@ -253,11 +239,8 @@ export const TDSpace = () => {
     sceneRef,
     cameraRef,
     meshRef,
-    stats,
-    setStats,
     zoomLevel,
     resetCamera,
     replaceModel,
-    setIsDefaultCube,
   };
 };

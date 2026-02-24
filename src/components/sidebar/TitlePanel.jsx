@@ -1,26 +1,23 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import LogoTitle from "../../../assets/logoTitle.svg";
-import InfoBox from "../../infoBox.jsx";
+import LogoTitle from "../../assets/logoTitle.svg";
+import InfoModal from "./InfoModal";
 import { SiGithub } from "react-icons/si";
 import { LuRotate3D, LuInfo } from "react-icons/lu";
 
-export default function Title() {
+export default function TitlePanel() {
   const [open, setOpen] = useState(false);
   const boxRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-      }
+      if (e.key === "Escape") setOpen(false);
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open]);
 
-  // Outside click to close
   useEffect(() => {
     if (!open) return;
     const handleClickOutside = (e) => {
@@ -63,27 +60,21 @@ export default function Title() {
           >
             <SiGithub className="hover:text-accent hover:border-accent size-full cursor-pointer rounded-full border border-transparent p-1 transition-colors duration-600 ease-in-out" />
           </a>
-
-          {/* Button */}
           <button onClick={() => setOpen(true)} className="size-full">
             <LuInfo className="hover:text-accent hover:border-accent size-full cursor-pointer rounded-full border border-transparent p-1 transition-colors duration-600 ease-in-out" />
           </button>
         </div>
       </div>
 
-      {/* Modal: Portal for leaving the parent container */}
       {open &&
         createPortal(
           <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-            {/* Blur background */}
             <div
               onClick={() => setOpen(false)}
               className="absolute inset-0 bg-black/30 backdrop-blur-sm"
             />
-
-            {/* Info box */}
             <div ref={boxRef} className="animate-fadeIn relative z-10">
-              <InfoBox />
+              <InfoModal />
             </div>
           </div>,
           document.body,

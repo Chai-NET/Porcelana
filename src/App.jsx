@@ -1,10 +1,10 @@
-import MainPage from "../src/pages/main_page.jsx";
+import ViewerPage from "./pages/ViewerPage";
 
 export default function App() {
   return (
     <>
       <div className="selection:text-dark25 selection:bg-white">
-        <MainPage />;
+        <ViewerPage />
       </div>
     </>
   );

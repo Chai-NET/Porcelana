@@ -1,5 +1,13 @@
 import { Eye, EyeClosed } from "lucide-react";
 
+const VIEW_MODES = [
+  { key: "wireframe", label: "Wireframe" },
+  { key: "matcap", label: "Matcap" },
+  { key: "basecolor", label: "Base" },
+  { key: "normals", label: "Normals" },
+  { key: "texture", label: "Texture" },
+];
+
 const ViewModeControls = ({ viewMode, setViewMode }) => (
   <div className="border-dark44 relative mb-6 h-36 min-h-35 w-full rounded-2xl rounded-b-lg border">
     <h3 className="font-jost bg-dark25 absolute -top-3 mx-6 block px-1 text-sm">
@@ -7,15 +15,8 @@ const ViewModeControls = ({ viewMode, setViewMode }) => (
     </h3>
     <div className="absolute -bottom-6 w-full px-3">
       <div className="flex justify-between gap-1 md:px-3 2xl:gap-2">
-        {[
-          { key: "wireframe", label: "Wireframe" },
-          { key: "matcap", label: "Matcap" },
-          { key: "basecolor", label: "Base" },
-          // Vertex Normals:
-          { key: "normals", label: "Normals" },
-          { key: "texture", label: "Texture" },
-        ].map(({ key, label }) => (
-          <div>
+        {VIEW_MODES.map(({ key, label }) => (
+          <div key={key}>
             <p
               className={`font-jost absolute -top-4 ml-7 origin-bottom-left -rotate-45 text-sm font-medium transition-colors delay-200 duration-500 ease-in-out ${
                 viewMode === key ? "text-accent" : "text-zinc-300"
@@ -25,21 +26,19 @@ const ViewModeControls = ({ viewMode, setViewMode }) => (
             </p>
 
             {/* Arrows */}
-            <div className="">
-              {/* <div className="bg-dark44 -mb-1 ml-5 size-2 rounded-full" /> */}
+            <div>
               <div
                 className={`ml-2 h-3 w-[2px] origin-bottom-left rotate-45 transition-colors delay-100 duration-300 ease-in-out ${
                   viewMode === key ? "bg-accent" : "bg-dark44"
-                } `}
+                }`}
               />
               <div
                 className={`ml-2 h-4 w-[2px] transition-colors duration-300 ${
                   viewMode === key ? "bg-accent" : "bg-dark44"
-                } `}
+                }`}
               />
             </div>
             <button
-              key={key}
               onClick={() => setViewMode(key)}
               className={`shadow-darkBlack from-dark25 group to-dark35 relative size-12 cursor-pointer overflow-clip rounded-lg border-2 from-10% p-3 text-left text-sm text-nowrap transition-all duration-300 ease-in-out ${
                 viewMode === key
@@ -47,16 +46,14 @@ const ViewModeControls = ({ viewMode, setViewMode }) => (
                   : "border-dark44 hover:border-accent/50 bg-gradient-to-tl text-zinc-300 hover:bg-zinc-100"
               }`}
             >
-              {/* {label} */}
-
-              <div className="">
+              <div>
                 <Eye
                   size={20}
                   className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all delay-150 duration-700 ease-linear ${
                     viewMode === key
                       ? "stroke-accent opacity-100"
                       : "translate-y-1 stroke-white opacity-0"
-                  } `}
+                  }`}
                 />
                 <EyeClosed
                   size={20}
@@ -64,7 +61,7 @@ const ViewModeControls = ({ viewMode, setViewMode }) => (
                     viewMode === key
                       ? "-translate-y-3 rotate-x-180 opacity-0"
                       : "rotate-0 opacity-100 group-hover:size-6"
-                  } `}
+                  }`}
                 />
               </div>
             </button>

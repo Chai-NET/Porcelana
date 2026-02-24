@@ -1,33 +1,20 @@
 import { useState, useEffect } from "react";
+import { useScreenSize } from "../../hooks/useScreenSize";
 import FileUpload from "./FileUpload";
 import ViewModeControls from "./ViewModeControls";
 import ModelInfo from "./ModelInfo";
 import TitlePanel from "./TitlePanel";
 import { LuChevronDown, LuChevronRight } from "react-icons/lu";
 
-const SidePanel = ({ viewMode, setViewMode, stats, onFileUpload }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+const Sidebar = ({ viewMode, setViewMode, stats, onFileUpload }) => {
+  const { isSmallScreen: shouldCollapse } = useScreenSize(1150);
+  const [isCollapsed, setIsCollapsed] = useState(shouldCollapse);
 
   useEffect(() => {
-    const handleResize = () => {
-      const screenWidth = window.innerWidth;
-      if (screenWidth < 1150) {
-        setIsCollapsed(true);
-      } else {
-        setIsCollapsed(false);
-      }
-    };
+    setIsCollapsed(shouldCollapse);
+  }, [shouldCollapse]);
 
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
-  };
+  const toggleCollapse = () => setIsCollapsed((prev) => !prev);
 
   return (
     <div
@@ -55,7 +42,7 @@ const SidePanel = ({ viewMode, setViewMode, stats, onFileUpload }) => {
           isCollapsed
             ? "pointer-events-none -translate-x-120 opacity-0"
             : "translate-x-0 opacity-100"
-        } `}
+        }`}
       >
         <TitlePanel />
         <FileUpload onFileUpload={onFileUpload} />
@@ -70,4 +57,4 @@ const SidePanel = ({ viewMode, setViewMode, stats, onFileUpload }) => {
   );
 };
 
-export default SidePanel;
+export default Sidebar;
