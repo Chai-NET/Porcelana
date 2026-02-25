@@ -53,7 +53,7 @@ export default function InfoModal() {
         <a
           rel="noreferrer"
           target="_blank"
-          href="https://github.com/Chai-NET"
+          href="http://chainet.dev/"
           className="flex w-1/2 cursor-pointer items-end rounded-2xl border border-transparent p-3 transition-colors duration-500 ease-in-out hover:border-white/35 hover:text-white"
         >
           <img src={ChaiNET_logo} className="w-20" alt="ChaiNET logo" />

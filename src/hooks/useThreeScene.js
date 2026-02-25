@@ -9,8 +9,9 @@ export const useThreeScene = () => {
   const cameraRef = useRef(null);
   const meshRef = useRef(null);
   const frameRef = useRef(null);
+  const isDefaultCubeRef = useRef(true); // ref — changing it won't re-run the scene effect
+  const panOffsetRef = useRef({ x: 0, y: 0 });
   const controlsRef = useRef({
-    isZooming: false,
     initialDistance: 5,
     currentDistance: 5,
     minDistance: 2.5,
@@ -18,10 +19,9 @@ export const useThreeScene = () => {
   });
 
   const [zoomLevel, setZoomLevel] = useState(100);
-  const [isDefaultCube, setIsDefaultCube] = useState(true);
 
   const calculateZoomPercentage = useCallback((distance) => {
-    const { minDistance, initialDistance } = controlsRef.current;
+    const { initialDistance } = controlsRef.current;
     const zoomFactor = initialDistance / distance;
     return Math.round(Math.max(100, Math.min(200, zoomFactor * 100)));
   }, []);
@@ -35,8 +35,7 @@ export const useThreeScene = () => {
 
     const maxDimension = Math.max(size.x, size.y, size.z);
     if (maxDimension > 0) {
-      const targetSize = 3.5;
-      const scaleFactor = targetSize / maxDimension;
+      const scaleFactor = 3.5 / maxDimension;
       object.scale.setScalar(scaleFactor);
     }
 
@@ -51,9 +50,7 @@ export const useThreeScene = () => {
       event.preventDefault();
 
       const { minDistance, maxDistance } = controlsRef.current;
-      const zoomSpeed = 0.1;
-      const delta = event.deltaY * 0.001 * zoomSpeed;
-
+      const delta = event.deltaY * 0.001 * 0.1;
       const newDistance = Math.max(
         minDistance,
         Math.min(maxDistance, controlsRef.current.currentDistance + delta),
@@ -62,8 +59,9 @@ export const useThreeScene = () => {
       controlsRef.current.currentDistance = newDistance;
 
       if (cameraRef.current) {
-        cameraRef.current.position.setLength(newDistance);
-        cameraRef.current.lookAt(0, 0, 0);
+        const { x, y } = panOffsetRef.current;
+        cameraRef.current.position.set(x, y, newDistance);
+        cameraRef.current.lookAt(x, y, 0);
         setZoomLevel(calculateZoomPercentage(newDistance));
       }
     },
@@ -87,18 +85,13 @@ export const useThreeScene = () => {
 
     const updateSize = () => {
       if (!mountRef.current) return;
-
-      const rect = mountRef.current.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
-
+      const { width, height } = mountRef.current.getBoundingClientRect();
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
-
       renderer.setSize(width, height, false);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-      camera.lookAt(0, 0, 0);
+      const { x, y } = panOffsetRef.current;
+      camera.lookAt(x, y, 0);
     };
 
     renderer.domElement.style.display = "block";
@@ -110,16 +103,15 @@ export const useThreeScene = () => {
     updateSize();
     setTimeout(() => updateSize(), 100);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 
-    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.9);
-    directionalLight1.position.set(1, 1, 1);
-    scene.add(directionalLight1);
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.9);
+    dirLight1.position.set(1, 1, 1);
+    scene.add(dirLight1);
 
-    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
-    directionalLight2.position.set(-1, -1, -1);
-    scene.add(directionalLight2);
+    const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+    dirLight2.position.set(-1, -1, -1);
+    scene.add(dirLight2);
 
     sceneRef.current = scene;
     rendererRef.current = renderer;
@@ -128,18 +120,16 @@ export const useThreeScene = () => {
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = createMaterial("basecolor", geometry);
     const mesh = new THREE.Mesh(geometry, material);
-
     centerAndScaleModel(mesh);
     scene.add(mesh);
     meshRef.current = mesh;
 
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
-
-      if (meshRef.current && isDefaultCube) {
+      // isDefaultCubeRef.current is read each frame — never stale, no re-render needed
+      if (meshRef.current && isDefaultCubeRef.current) {
         meshRef.current.rotation.y += 0.003;
       }
-
       renderer.render(scene, camera);
     };
     animate();
@@ -148,23 +138,15 @@ export const useThreeScene = () => {
     canvas.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("resize", updateSize);
 
-    const resizeObserver = new ResizeObserver(() => {
-      updateSize();
-    });
-
-    if (mountRef.current) {
-      resizeObserver.observe(mountRef.current);
-    }
+    const resizeObserver = new ResizeObserver(updateSize);
+    resizeObserver.observe(mountRef.current);
 
     return () => {
       canvas.removeEventListener("wheel", handleWheel);
       window.removeEventListener("resize", updateSize);
       resizeObserver.disconnect();
-
-      if (frameRef.current) {
-        cancelAnimationFrame(frameRef.current);
-      }
-      if (renderer.domElement && renderer.domElement.parentNode) {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      if (renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);
       }
       renderer.dispose();
@@ -173,23 +155,34 @@ export const useThreeScene = () => {
       scene.traverse((object) => {
         if (object.geometry) object.geometry.dispose();
         if (object.material) {
-          if (Array.isArray(object.material)) {
-            object.material.forEach((mat) => mat.dispose());
-          } else {
-            object.material.dispose();
-          }
+          const mats = Array.isArray(object.material)
+            ? object.material
+            : [object.material];
+          mats.forEach((mat) => mat.dispose());
         }
       });
     };
-  }, [centerAndScaleModel, handleWheel, isDefaultCube]);
+  }, [centerAndScaleModel, handleWheel]); // isDefaultCubeRef removed — it's a ref, not state
 
   const resetCamera = useCallback(() => {
-    if (cameraRef.current && meshRef.current) {
-      controlsRef.current.currentDistance = controlsRef.current.initialDistance;
-      cameraRef.current.position.set(0, 0, controlsRef.current.initialDistance);
-      cameraRef.current.lookAt(0, 0, 0);
-      setZoomLevel(100);
-    }
+    if (!cameraRef.current || !meshRef.current) return;
+    panOffsetRef.current = { x: 0, y: 0 };
+    controlsRef.current.currentDistance = controlsRef.current.initialDistance;
+    cameraRef.current.position.set(0, 0, controlsRef.current.initialDistance);
+    cameraRef.current.lookAt(0, 0, 0);
+    setZoomLevel(100);
+  }, []);
+
+  const handlePan = useCallback((deltaX, deltaY) => {
+    if (!cameraRef.current) return;
+    // Scale pan speed relative to zoom distance so it feels consistent
+    const panSpeed = controlsRef.current.currentDistance * 0.001;
+    panOffsetRef.current.x -= deltaX * panSpeed;
+    panOffsetRef.current.y += deltaY * panSpeed;
+    const { x, y } = panOffsetRef.current;
+    const z = controlsRef.current.currentDistance;
+    cameraRef.current.position.set(x, y, z);
+    cameraRef.current.lookAt(x, y, 0);
   }, []);
 
   const replaceModel = useCallback(
@@ -198,36 +191,26 @@ export const useThreeScene = () => {
 
       if (meshRef.current) {
         sceneRef.current.remove(meshRef.current);
-
         meshRef.current.traverse((child) => {
-          if (child.geometry) {
-            child.geometry.dispose();
-          }
+          if (child.geometry) child.geometry.dispose();
           if (child.material) {
-            if (Array.isArray(child.material)) {
-              child.material.forEach((mat) => {
-                if (mat.map) mat.map.dispose();
-                if (mat.normalMap) mat.normalMap.dispose();
-                if (mat.roughnessMap) mat.roughnessMap.dispose();
-                if (mat.metalnessMap) mat.metalnessMap.dispose();
-                mat.dispose();
-              });
-            } else {
-              if (child.material.map) child.material.map.dispose();
-              if (child.material.normalMap) child.material.normalMap.dispose();
-              if (child.material.roughnessMap)
-                child.material.roughnessMap.dispose();
-              if (child.material.metalnessMap)
-                child.material.metalnessMap.dispose();
-              child.material.dispose();
-            }
+            const mats = Array.isArray(child.material)
+              ? child.material
+              : [child.material];
+            mats.forEach((mat) => {
+              if (mat.map) mat.map.dispose();
+              if (mat.normalMap) mat.normalMap.dispose();
+              if (mat.roughnessMap) mat.roughnessMap.dispose();
+              if (mat.metalnessMap) mat.metalnessMap.dispose();
+              mat.dispose();
+            });
           }
         });
       }
 
       sceneRef.current.add(newModel);
       meshRef.current = newModel;
-      setIsDefaultCube(false);
+      isDefaultCubeRef.current = false; // ref mutation — no re-render, no scene teardown
       centerAndScaleModel(newModel);
       resetCamera();
     },
@@ -241,6 +224,7 @@ export const useThreeScene = () => {
     meshRef,
     zoomLevel,
     resetCamera,
+    handlePan,
     replaceModel,
   };
 };

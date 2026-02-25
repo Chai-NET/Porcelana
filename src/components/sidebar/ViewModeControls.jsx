@@ -18,7 +18,7 @@ const ViewModeControls = ({ viewMode, setViewMode }) => (
         {VIEW_MODES.map(({ key, label }) => (
           <div key={key}>
             <p
-              className={`font-jost absolute -top-4 ml-7 origin-bottom-left -rotate-45 text-sm font-medium transition-colors delay-200 duration-500 ease-in-out ${
+              className={`font-jost absolute -top-2 ml-6 origin-bottom-left -rotate-45 text-xs font-normal transition-colors delay-200 duration-500 ease-in-out select-all ${
                 viewMode === key ? "text-accent" : "text-zinc-300"
               }`}
             >

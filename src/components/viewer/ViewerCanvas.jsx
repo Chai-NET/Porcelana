@@ -1,7 +1,13 @@
-const ViewerCanvas = ({ mountRef, onMouseDown }) => (
+const ViewerCanvas = ({ mountRef, onMouseDown, isDragging, isPanning }) => (
   <div
     ref={mountRef}
-    className="absolute inset-0 cursor-grab active:cursor-grabbing"
+    className={`absolute inset-0 ${
+      isPanning
+        ? "cursor-move"
+        : isDragging
+          ? "cursor-grabbing"
+          : "cursor-grab"
+    }`}
     onMouseDown={onMouseDown}
   />
 );

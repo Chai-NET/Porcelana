@@ -5,7 +5,7 @@ const FALLBACK_TEXTURE_URL =
   "https://threejs.org/examples/textures/uv_grid_opengl.jpg";
 
 export const useModelLoader = (replaceModel) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(null); // null = idle, 0–100 = loading
   const [error, setError] = useState("");
   const [modelTexture, setModelTexture] = useState(null);
   const [stats, setStats] = useState({
@@ -18,48 +18,33 @@ export const useModelLoader = (replaceModel) => {
     const file = event.target.files[0];
     if (!file) return;
 
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+    if (fileExtension !== "glb") {
+      setError("Only .glb files are supported.");
+      return;
+    }
+
     const fileName = file.name;
     const fileSize = file.size;
     const fileSizeKB = (fileSize / 1024).toFixed(2);
     const fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
 
-    console.log("File info:", {
-      name: fileName,
-      size: fileSize,
-      sizeKB: fileSizeKB + " KB",
-      sizeMB: fileSizeMB + " MB",
-    });
-
-    setIsLoading(true);
+    setLoadingProgress(0);
     setError("");
-
-    const fileExtension = file.name.split(".").pop().toLowerCase();
-    if (fileExtension !== "glb") {
-      setError("Only .glb files are supported.");
-      setIsLoading(false);
-      return;
-    }
-
-    const materialAnalysis = {
-      hasPBR: false,
-      hasTextures: false,
-      textureTypes: [],
-      materialCount: 0,
-      materials: [],
-    };
 
     setStats((prev) => ({
       ...prev,
-      format: `.glb`,
-      fileName: fileName,
-      fileSize: fileSize,
-      fileSizeKB: fileSizeKB,
-      fileSizeMB: fileSizeMB,
+      format: ".glb",
+      fileName,
+      fileSize,
+      fileSizeKB,
+      fileSizeMB,
     }));
 
     try {
-      const module = await import("three/examples/jsm/loaders/GLTFLoader.js");
-      const GLTFLoader = module.GLTFLoader;
+      const { GLTFLoader } = await import(
+        "three/examples/jsm/loaders/GLTFLoader.js"
+      );
       const loader = new GLTFLoader();
       const url = URL.createObjectURL(file);
 
@@ -69,157 +54,126 @@ export const useModelLoader = (replaceModel) => {
           const model = gltf.scene;
           replaceModel(model);
 
+          const materialAnalysis = {
+            hasPBR: false,
+            hasTextures: false,
+            textureTypes: [],
+            materialCount: 0,
+            materials: [],
+          };
+
           let foundTexture = null;
-          const materials = new Set();
+          const materialSet = new Set();
 
           model.traverse((child) => {
-            if (child.isMesh && child.material) {
-              const material = child.material;
-              materials.add(material);
+            if (!child.isMesh || !child.material) return;
+            const mat = child.material;
+            materialSet.add(mat);
 
-              if (material.map) {
-                foundTexture = material.map;
-                materialAnalysis.hasTextures = true;
-                if (!materialAnalysis.textureTypes.includes("diffuse/albedo")) {
-                  materialAnalysis.textureTypes.push("diffuse/albedo");
-                }
-              }
+            if (mat.map) {
+              foundTexture = mat.map;
+              materialAnalysis.hasTextures = true;
+              if (!materialAnalysis.textureTypes.includes("diffuse/albedo"))
+                materialAnalysis.textureTypes.push("diffuse/albedo");
+            }
 
-              if (
-                material.isMeshStandardMaterial ||
-                material.isMeshPhysicalMaterial
-              ) {
-                materialAnalysis.hasPBR = true;
-
-                if (
-                  material.normalMap &&
-                  !materialAnalysis.textureTypes.includes("normal")
-                ) {
-                  materialAnalysis.textureTypes.push("normal");
-                }
-                if (
-                  material.roughnessMap &&
-                  !materialAnalysis.textureTypes.includes("roughness")
-                ) {
-                  materialAnalysis.textureTypes.push("roughness");
-                }
-                if (
-                  material.metalnessMap &&
-                  !materialAnalysis.textureTypes.includes("metalness")
-                ) {
-                  materialAnalysis.textureTypes.push("metalness");
-                }
-                if (
-                  material.aoMap &&
-                  !materialAnalysis.textureTypes.includes("ambient occlusion")
-                ) {
-                  materialAnalysis.textureTypes.push("ambient occlusion");
-                }
-                if (
-                  material.emissiveMap &&
-                  !materialAnalysis.textureTypes.includes("emissive")
-                ) {
-                  materialAnalysis.textureTypes.push("emissive");
-                }
-                if (
-                  material.bumpMap &&
-                  !materialAnalysis.textureTypes.includes("bump")
-                ) {
-                  materialAnalysis.textureTypes.push("bump");
-                }
-                if (
-                  material.displacementMap &&
-                  !materialAnalysis.textureTypes.includes("displacement")
-                ) {
-                  materialAnalysis.textureTypes.push("displacement");
-                }
-              }
-
-              materialAnalysis.materials.push({
-                name: material.name || "Unnamed Material",
-                type: material.type,
-                isPBR:
-                  material.isMeshStandardMaterial ||
-                  material.isMeshPhysicalMaterial,
-                hasTextures: !!(
-                  material.map ||
-                  material.normalMap ||
-                  material.roughnessMap ||
-                  material.metalnessMap ||
-                  material.aoMap ||
-                  material.emissiveMap
-                ),
-                color: material.color
-                  ? `#${material.color.getHexString()}`
-                  : null,
-                roughness: material.roughness || null,
-                metalness: material.metalness || null,
+            if (mat.isMeshStandardMaterial || mat.isMeshPhysicalMaterial) {
+              materialAnalysis.hasPBR = true;
+              const maps = {
+                normal: mat.normalMap,
+                roughness: mat.roughnessMap,
+                metalness: mat.metalnessMap,
+                "ambient occlusion": mat.aoMap,
+                emissive: mat.emissiveMap,
+                bump: mat.bumpMap,
+                displacement: mat.displacementMap,
+              };
+              Object.entries(maps).forEach(([label, tex]) => {
+                if (tex && !materialAnalysis.textureTypes.includes(label))
+                  materialAnalysis.textureTypes.push(label);
               });
             }
+
+            materialAnalysis.materials.push({
+              name: mat.name || "Unnamed Material",
+              type: mat.type,
+              isPBR: mat.isMeshStandardMaterial || mat.isMeshPhysicalMaterial,
+              hasTextures: !!(
+                mat.map ||
+                mat.normalMap ||
+                mat.roughnessMap ||
+                mat.metalnessMap ||
+                mat.aoMap ||
+                mat.emissiveMap
+              ),
+              color: mat.color ? `#${mat.color.getHexString()}` : null,
+              roughness: mat.roughness ?? null,
+              metalness: mat.metalness ?? null,
+            });
           });
 
-          materialAnalysis.materialCount = materials.size;
-          console.log("Material Analysis:", materialAnalysis);
+          materialAnalysis.materialCount = materialSet.size;
 
-          if (foundTexture) {
-            setModelTexture(foundTexture);
-          } else {
-            const fallback = new THREE.TextureLoader().load(FALLBACK_TEXTURE_URL);
-            setModelTexture(fallback);
-          }
+          setModelTexture(
+            foundTexture ??
+              new THREE.TextureLoader().load(FALLBACK_TEXTURE_URL),
+          );
 
           let triangles = 0,
             vertices = 0,
             meshCount = 0;
 
           model.traverse((child) => {
-            if (child.isMesh && child.geometry) {
-              meshCount++;
-              triangles += child.geometry.index
-                ? child.geometry.index.count / 3
-                : child.geometry.attributes.position.count / 3;
-              vertices += child.geometry.attributes.position.count;
-            }
+            if (!child.isMesh || !child.geometry) return;
+            meshCount++;
+            triangles += child.geometry.index
+              ? child.geometry.index.count / 3
+              : child.geometry.attributes.position.count / 3;
+            vertices += child.geometry.attributes.position.count;
           });
 
           const box = new THREE.Box3().setFromObject(model);
           const size = box.getSize(new THREE.Vector3());
-          const dimensions = {
-            width: size.x.toFixed(2),
-            height: size.y.toFixed(2),
-            depth: size.z.toFixed(2),
-          };
 
           setStats({
             triangles: Math.floor(triangles),
-            vertices: vertices,
-            meshCount: meshCount,
-            format: `.glb`,
-            fileName: fileName,
-            fileSize: fileSize,
-            fileSizeKB: fileSizeKB,
-            fileSizeMB: fileSizeMB,
-            dimensions: dimensions,
-            materialAnalysis: materialAnalysis,
+            vertices,
+            meshCount,
+            format: ".glb",
+            fileName,
+            fileSize,
+            fileSizeKB,
+            fileSizeMB,
+            dimensions: {
+              width: size.x.toFixed(2),
+              height: size.y.toFixed(2),
+              depth: size.z.toFixed(2),
+            },
+            materialAnalysis,
           });
 
-          setIsLoading(false);
+          setLoadingProgress(null);
           URL.revokeObjectURL(url);
         },
-        undefined,
+        (xhr) => {
+          // xhr.total equals file.size for blob: URLs, so progress is always accurate
+          if (xhr.total > 0) {
+            setLoadingProgress(Math.round((xhr.loaded / xhr.total) * 100));
+          }
+        },
         (err) => {
           setError("Failed to load GLB model. Please try a different file.");
-          setIsLoading(false);
+          setLoadingProgress(null);
           URL.revokeObjectURL(url);
           console.error("Error loading GLB:", err);
         },
       );
     } catch (err) {
       setError("Failed to load 3D model. Please try a different file.");
-      setIsLoading(false);
+      setLoadingProgress(null);
       console.error("Error loading file:", err);
     }
   };
 
-  return { isLoading, error, modelTexture, stats, handleFileUpload };
+  return { loadingProgress, error, modelTexture, stats, handleFileUpload };
 };
