@@ -49,7 +49,8 @@ const Sidebar = ({ viewMode, setViewMode, stats, onFileUpload }) => {
         <ViewModeControls viewMode={viewMode} setViewMode={setViewMode} />
         <ModelInfo stats={stats} />
         <h2 className="font-jost mx-auto py-3 text-center text-xs font-light">
-          © 2025 | ChaiNET FOSS Project | chainet.dev <br />
+          © {new Date().getFullYear()} | ChaiNET FOSS Project | chainet.dev{" "}
+          <br />
           Developed and maintained by Pluwia | plu.moe
         </h2>
       </div>

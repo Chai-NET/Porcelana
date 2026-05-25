@@ -62,7 +62,8 @@ export default function InfoModal() {
               ChaiNET <span className="text-xs">©</span>
             </h3>
             <p className="w-50 text-sm">
-              The application is part of the <br /> 2025 | ChaiNET FOSS Project.
+              The application is part of the <br /> {new Date().getFullYear()} |
+              ChaiNET FOSS Project.
             </p>
           </div>
         </a>
@@ -72,7 +73,7 @@ export default function InfoModal() {
 
       <div className="mt-2 flex items-end justify-between px-1">
         <p className="text-start text-sm">
-          © 2025 | ChaiNET FOSS Project | chainet.dev
+          © {new Date().getFullYear()} | ChaiNET FOSS Project | chainet.dev
           <br />
           <span className="text-dark25 bg-white/75 px-1 pr-3 text-start text-sm font-semibold">
             Developed & maintained by Pluwia ad Astra* | plu.moe
