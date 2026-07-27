@@ -1,0 +1,32 @@
+import ViewerCanvas from "./ViewerCanvas";
+import LoadingOverlay from "./LoadingOverlay";
+import ScreenAlert from "./ScreenAlert";
+import ErrorMessage from "./ErrorMessage";
+import ZoomIndicator from "./ZoomIndicator";
+
+const ViewerStage = ({
+  mountRef,
+  interaction,
+  loadingProgress,
+  error,
+  zoomLevel,
+  children,
+}) => (
+  <div className="relative flex-1 overflow-hidden">
+    <ViewerCanvas
+      mountRef={mountRef}
+      onMouseDown={interaction.handleMouseDown}
+      isDragging={interaction.isDragging}
+      isPanning={interaction.isPanning}
+    />
+    <LoadingOverlay loadingProgress={loadingProgress} />
+    <ScreenAlert />
+    <ErrorMessage error={error} />
+    {children}
+    {loadingProgress === null && !error && (
+      <ZoomIndicator zoomLevel={zoomLevel} />
+    )}
+  </div>
+);
+
+export default ViewerStage;

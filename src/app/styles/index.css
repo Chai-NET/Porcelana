@@ -1,7 +1,8 @@
 /* Jost */
 @font-face {
   font-family: "Jost";
-  src: url("./assets/fonts/Jost/static/Jost-Thin.ttf") format("truetype");
+  src: url("../../shared/assets/fonts/Jost/static/Jost-Thin.ttf")
+    format("truetype");
   font-weight: 100;
   font-style: normal;
   font-display: swap;
@@ -9,7 +10,8 @@
 
 @font-face {
   font-family: "Jost";
-  src: url("./assets/fonts/Jost/static/Jost-ExtraLight.ttf") format("truetype");
+  src: url("../../shared/assets/fonts/Jost/static/Jost-ExtraLight.ttf")
+    format("truetype");
   font-weight: 200;
   font-style: normal;
   font-display: swap;
@@ -17,7 +19,8 @@
 
 @font-face {
   font-family: "Jost";
-  src: url("./assets/fonts/Jost/static/Jost-Light.ttf") format("truetype");
+  src: url("../../shared/assets/fonts/Jost/static/Jost-Light.ttf")
+    format("truetype");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -25,7 +28,8 @@
 
 @font-face {
   font-family: "Jost";
-  src: url("./assets/fonts/Jost/static/Jost-Regular.ttf") format("truetype");
+  src: url("../../shared/assets/fonts/Jost/static/Jost-Regular.ttf")
+    format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -33,7 +37,8 @@
 
 @font-face {
   font-family: "Jost";
-  src: url("./assets/fonts/Jost/static/Jost-Medium.ttf") format("truetype");
+  src: url("../../shared/assets/fonts/Jost/static/Jost-Medium.ttf")
+    format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -41,7 +46,8 @@
 
 @font-face {
   font-family: "Jost";
-  src: url("./assets/fonts/Jost/static/Jost-SemiBold.ttf") format("truetype");
+  src: url("../../shared/assets/fonts/Jost/static/Jost-SemiBold.ttf")
+    format("truetype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -49,7 +55,8 @@
 
 @font-face {
   font-family: "Jost";
-  src: url("./assets/fonts/Jost/static/Jost-Bold.ttf") format("truetype");
+  src: url("../../shared/assets/fonts/Jost/static/Jost-Bold.ttf")
+    format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -57,7 +64,8 @@
 
 @font-face {
   font-family: "Jost";
-  src: url("./assets/fonts/Jost/static/Jost-ExtraBold.ttf") format("truetype");
+  src: url("../../shared/assets/fonts/Jost/static/Jost-ExtraBold.ttf")
+    format("truetype");
   font-weight: 800;
   font-style: normal;
   font-display: swap;
@@ -65,7 +73,8 @@
 
 @font-face {
   font-family: "Jost";
-  src: url("./assets/fonts/Jost/static/Jost-Black.ttf") format("truetype");
+  src: url("../../shared/assets/fonts/Jost/static/Jost-Black.ttf")
+    format("truetype");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
@@ -74,7 +83,7 @@
 /* Mozilla Text */
 @font-face {
   font-family: "Mozilla Text";
-  src: url("./assets/fonts/Mozilla_Text/static/MozillaText-ExtraLight.ttf")
+  src: url("../../shared/assets/fonts/Mozilla_Text/static/MozillaText-ExtraLight.ttf")
     format("truetype");
   font-weight: 200;
   font-style: normal;
@@ -83,7 +92,7 @@
 
 @font-face {
   font-family: "Mozilla Text";
-  src: url("./assets/fonts/Mozilla_Text/static/MozillaText-Light.ttf")
+  src: url("../../shared/assets/fonts/Mozilla_Text/static/MozillaText-Light.ttf")
     format("truetype");
   font-weight: 300;
   font-style: normal;
@@ -92,7 +101,7 @@
 
 @font-face {
   font-family: "Mozilla Text";
-  src: url("./assets/fonts/Mozilla_Text/static/MozillaText-Regular.ttf")
+  src: url("../../shared/assets/fonts/Mozilla_Text/static/MozillaText-Regular.ttf")
     format("truetype");
   font-weight: 400;
   font-style: normal;
@@ -101,7 +110,7 @@
 
 @font-face {
   font-family: "Mozilla Text";
-  src: url("./assets/fonts/Mozilla_Text/static/MozillaText-Medium.ttf")
+  src: url("../../shared/assets/fonts/Mozilla_Text/static/MozillaText-Medium.ttf")
     format("truetype");
   font-weight: 500;
   font-style: normal;
@@ -110,7 +119,7 @@
 
 @font-face {
   font-family: "Mozilla Text";
-  src: url("./assets/fonts/Mozilla_Text/static/MozillaText-SemiBold.ttf")
+  src: url("../../shared/assets/fonts/Mozilla_Text/static/MozillaText-SemiBold.ttf")
     format("truetype");
   font-weight: 600;
   font-style: normal;
@@ -119,7 +128,7 @@
 
 @font-face {
   font-family: "Mozilla Text";
-  src: url("./assets/fonts/Mozilla_Text/static/MozillaText-Bold.ttf")
+  src: url("../../shared/assets/fonts/Mozilla_Text/static/MozillaText-Bold.ttf")
     format("truetype");
   font-weight: 700;
   font-style: normal;

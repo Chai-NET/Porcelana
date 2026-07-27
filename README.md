@@ -35,7 +35,7 @@ Porcelana ships with sample models in its asset library. These are the work of t
 
 > "Old Armchair" by MaX3Dd is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
-If you redistribute or fork this project, keep these attributions intact. Model metadata lives in [`src/data/presetAssets.json`](src/data/presetAssets.json).
+If you redistribute or fork this project, keep these attributions intact. Model metadata lives in [`src/entities/preset-asset/config/catalog.json`](src/entities/preset-asset/config/catalog.json).
 
 ---
 
