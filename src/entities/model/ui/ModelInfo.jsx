@@ -6,15 +6,16 @@ const ModelInfo = ({ stats }) => {
   const { materialAnalysis: ma } = stats;
 
   return (
-    <div className="border-dark44 shadow-darkBlack from-dark25 to-dark44/45 rounded-lg border bg-gradient-to-bl p-4 shadow">
-      <h3 className="font-jost my-3 mb-6 text-lg font-semibold">Model Info</h3>
+    <div className="border-dark44 shadow-darkBlack from-dark25 to-dark44/45 rounded-lg border bg-gradient-to-bl p-3 shadow @xs:p-4">
+      <h3 className="font-jost my-3 mb-6 text-base font-semibold @xs:text-lg">
+        Model Info
+      </h3>
 
-      <div className="font-jost space-y-1.5 px-1 text-sm">
-        {/* Name */}
+      <div className="font-jost space-y-1.5 px-1 text-xs @xs:text-sm">
         <StatRow label="Name:">
-          <div className="text-accent flex items-center gap-1">
-            <IoCubeOutline />
-            <span className="font-mono select-all">
+          <div className="text-accent flex min-w-0 items-start justify-end gap-1">
+            <IoCubeOutline className="mt-0.5 shrink-0" />
+            <span className="font-mono break-all select-all">
               {stats.fileName ?? "Cube"}
             </span>
           </div>
@@ -40,7 +41,6 @@ const ModelInfo = ({ stats }) => {
           <span className="font-bold">{formatNumber(stats.vertices)}</span>
         </StatRow>
 
-        {/* Per-model data — only shown after upload */}
         {ma && (
           <>
             <div className="border-dark44 my-2 border-t" />
@@ -83,7 +83,7 @@ const ModelInfo = ({ stats }) => {
 
             {stats.dimensions && (
               <StatRow label="Dimensions:">
-                <span className="font-mono text-xs text-zinc-400">
+                <span className="font-mono text-xs break-words text-zinc-400">
                   {stats.dimensions.width} × {stats.dimensions.height} ×{" "}
                   {stats.dimensions.depth}
                 </span>

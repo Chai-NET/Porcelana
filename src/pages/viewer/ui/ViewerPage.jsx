@@ -6,13 +6,6 @@ import { ViewerStage } from "@/widgets/viewer-stage";
 import { ViewerToolbar } from "@/widgets/viewer-toolbar";
 import { ModelSidebar } from "@/widgets/model-sidebar";
 
-/**
- * The only page: it wires the hooks together and lays the widgets out.
- *
- * The hook order is load-bearing — each one consumes what the previous returns:
- * the scene owns the refs, the loader feeds it models, the view mode repaints
- * the mounted model, and the interaction hook drives both mesh and camera.
- */
 const ViewerPage = () => {
   const {
     mountRef,

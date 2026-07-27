@@ -33,7 +33,7 @@ const FileUpload = ({ onSelectFile }) => {
   return (
     <div className="group mb-6 transition-all duration-500 ease-in-out">
       <label
-        className={`shadow-dark25/0 flex h-30 w-full cursor-pointer items-center justify-center rounded-2xl border-[0.14rem] border-dashed shadow-lg transition-all duration-500 ease-in-out 2xl:h-35 ${
+        className={`shadow-dark25/0 flex h-24 w-full cursor-pointer items-center justify-center rounded-2xl border-[0.14rem] border-dashed shadow-lg transition-all duration-500 ease-in-out @xs:h-30 @sm:h-35 ${
           isDragOver
             ? "border-zinc-100 bg-zinc-800/50 shadow-white/30"
             : "border-zinc-600 group-hover:border-zinc-100 group-hover:shadow-white/30"
@@ -43,15 +43,15 @@ const FileUpload = ({ onSelectFile }) => {
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        <div className="font-mozilla text-center">
+        <div className="font-mozilla px-3 text-center">
           <Upload
-            className={`mx-auto mb-3 size-9 stroke-1 transition-normal duration-700 ease-in-out ${
+            className={`mx-auto mb-2 size-7 stroke-1 transition-normal duration-700 ease-in-out @xs:mb-3 @xs:size-9 ${
               isDragOver ? "stroke-3" : "group-hover:stroke-3"
             }`}
             size={24}
           />
           <span
-            className={`text-sm font-semibold transition-all duration-500 text-shadow-none text-shadow-zinc-600 ${
+            className={`text-xs font-semibold transition-all duration-500 text-shadow-none text-shadow-zinc-600 @xs:text-sm ${
               isDragOver
                 ? "text-white text-shadow-md"
                 : "text-zinc-300 group-hover:text-white group-hover:text-shadow-md"

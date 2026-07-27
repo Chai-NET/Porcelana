@@ -2,13 +2,6 @@ import { useState, useEffect } from "react";
 import { createMaterial } from "../lib/createMaterial";
 import { DEFAULT_VIEW_MODE } from "../config/viewModes";
 
-/**
- * Repaints every mesh in the mounted model whenever the mode or texture changes.
- *
- * An authored material is never disposed here: it has to survive every switch
- * away from Original so it can be restored again. Only generated materials —
- * the ones that differ from the stashed original — are freed.
- */
 export const useViewMode = (meshRef, modelTexture, originalMaterialsRef) => {
   const [viewMode, setViewMode] = useState(DEFAULT_VIEW_MODE);
 

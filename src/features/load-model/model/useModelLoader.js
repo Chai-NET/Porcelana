@@ -10,14 +10,6 @@ const PLACEHOLDER_STATS = {
   format: "Default Cube",
 };
 
-/**
- * Loads a model into the scene and derives the stats shown beside it.
- *
- * Every source funnels into one private `loadFromUrl`: GLTFLoader streams
- * straight from the URL, so a bundled asset is never copied into a Blob first
- * and `cleanup` (revoking an object URL) is simply absent for it. Adding a
- * source means adding another thin entry point, not a second loading path.
- */
 export const useModelLoader = (replaceModel) => {
   const [loadingProgress, setLoadingProgress] = useState(null); // null = idle, 0–100 = loading
   const [error, setError] = useState("");
@@ -33,7 +25,6 @@ export const useModelLoader = (replaceModel) => {
       setStats((prev) => ({ ...prev, ...fileDetails }));
 
       try {
-        // Kept out of the initial bundle — preserve the dynamic import.
         const { GLTFLoader } = await import(
           "three/examples/jsm/loaders/GLTFLoader.js"
         );
@@ -74,7 +65,6 @@ export const useModelLoader = (replaceModel) => {
     [replaceModel],
   );
 
-  /** Entry point for a user-provided File (picker or drag-and-drop). */
   const loadFile = useCallback(
     (file) => {
       if (!file) return;
@@ -92,7 +82,6 @@ export const useModelLoader = (replaceModel) => {
     [loadFromUrl],
   );
 
-  /** Entry point for a bundled catalog asset. */
   const loadPresetAsset = useCallback(
     (asset) =>
       loadFromUrl(asset.url, {

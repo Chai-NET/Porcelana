@@ -2,11 +2,6 @@ import { useState, useCallback, useEffect } from "react";
 
 const ROTATION_SPEED = 0.01; // radians per pixel dragged
 
-/**
- * Turns mouse drags into model rotation (left button) or camera pan (middle
- * button / Shift+left). Rotation mutates the pivot's `rotation` directly rather
- * than going through React state — the render loop reads it every frame.
- */
 export const useModelInteraction = (meshRef, handlePan) => {
   const [interactionMode, setInteractionMode] = useState(null); // 'rotate' | 'pan' | null
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });

@@ -25,7 +25,6 @@ const ZoomIndicator = ({ zoomLevel }) => {
               />
             </div>
 
-            {/* Tick marks — 0%, 100%, 200% */}
             <div className="pointer-events-none absolute top-0 left-0 flex h-2 w-full items-center justify-between">
               <div className="-mt-0.5 h-3 w-0.5 rounded-full bg-zinc-300" />
               <div className="-mt-0.5 h-3 w-0.5 rounded-full bg-zinc-300" />

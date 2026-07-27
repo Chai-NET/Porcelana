@@ -3,11 +3,11 @@ export const CAMERA = {
   fov: 75,
   near: 0.1,
   far: 1000,
-  /** Distance the camera returns to on reset — the 100% zoom anchor. */
+  /** Distance the camera returns to on reset - the 100% zoom anchor. */
   initialDistance: 5,
-  /** Closest the camera may get — 200% zoom. */
+  /** Closest the camera may get - 200% zoom. */
   minDistance: 2.5,
-  /** Farthest the camera may get — 0% zoom. */
+  /** Farthest the camera may get - 0% zoom. */
   maxDistance: 10,
 };
 

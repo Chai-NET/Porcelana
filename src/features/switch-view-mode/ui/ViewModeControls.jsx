@@ -7,7 +7,7 @@ const ViewModeControls = ({ viewMode, setViewMode, hasOriginal }) => (
       View modes
     </h3>
     <div className="absolute -bottom-6 w-full px-3">
-      <div className="flex justify-between gap-1 md:px-3 2xl:gap-1.5">
+      <div className="flex justify-between gap-1 @xs:px-3 @sm:gap-1.5">
         {VIEW_MODES.map(({ key, label, requiresModel }) => {
           const isActive = viewMode === key;
           const isDisabled = requiresModel && !hasOriginal;
@@ -15,7 +15,7 @@ const ViewModeControls = ({ viewMode, setViewMode, hasOriginal }) => (
           return (
             <div key={key}>
               <p
-                className={`font-jost absolute -top-2 ml-6 origin-bottom-left -rotate-45 text-xs font-normal transition-colors delay-200 duration-500 ease-in-out select-all ${
+                className={`font-jost absolute -top-2 ml-4 origin-bottom-left -rotate-45 text-[0.65rem] font-normal transition-colors delay-200 duration-500 ease-in-out select-all @xs:ml-6 @xs:text-xs ${
                   isActive
                     ? "text-accent"
                     : isDisabled
@@ -47,7 +47,7 @@ const ViewModeControls = ({ viewMode, setViewMode, hasOriginal }) => (
                     ? "Upload a model to view its own materials"
                     : label
                 }
-                className={`shadow-darkBlack from-dark25 group to-dark35 relative size-11 overflow-clip rounded-lg border-2 from-10% p-3 text-left text-sm text-nowrap transition-all duration-300 ease-in-out ${
+                className={`shadow-darkBlack from-dark25 group to-dark35 relative size-9 overflow-clip rounded-lg border-2 from-10% p-3 text-left text-sm text-nowrap transition-all duration-300 ease-in-out @xs:size-11 ${
                   isActive
                     ? "border-accent bg-gradient-to-bl text-white shadow-inner"
                     : isDisabled
