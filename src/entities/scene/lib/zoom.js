@@ -45,6 +45,10 @@ const DELTA_MODE_SCALE = {
 /**
  * Wheel events report deltas in pixels, lines or pages depending on browser and
  * input device; normalizing to pixels keeps zoom speed device-independent.
+ * Some browsers move the delta onto the X axis while Shift is held.
  */
-export const normalizeWheelDelta = (event) =>
-  event.deltaY * (DELTA_MODE_SCALE[event.deltaMode] ?? 1);
+export const normalizeWheelDelta = (event) => {
+  const delta =
+    event.deltaY !== 0 ? event.deltaY : event.shiftKey ? event.deltaX : 0;
+  return delta * (DELTA_MODE_SCALE[event.deltaMode] ?? 1);
+};

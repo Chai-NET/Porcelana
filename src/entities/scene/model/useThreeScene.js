@@ -4,7 +4,12 @@ import {
   collectSubtreeResources,
   disposeMaterial,
 } from "@/shared/lib/three/dispose";
-import { IDLE_ROTATION_SPEED, ZOOM_SPEED_PER_PIXEL } from "../config/scene";
+import { PRECISION_MODIFIER } from "@/shared/config/controls";
+import {
+  IDLE_ROTATION_SPEED,
+  TURNTABLE_ROTATION_SPEED,
+  ZOOM_SPEED_PER_PIXEL,
+} from "../config/scene";
 import { createCamera, createRenderer, createScene } from "../lib/sceneFactory";
 import {
   createCenteredPivot,
@@ -12,13 +17,14 @@ import {
 } from "../lib/normalizeModel";
 import { normalizeWheelDelta } from "../lib/zoom";
 import { useCameraRig } from "./useCameraRig";
+import { useTurntable } from "./useTurntable";
 
 /**
  * Owns the renderer, the scene graph and the model currently mounted in it.
  *
  * Mutable scene facts live in refs, not state: re-running the setup effect would
  * tear down and rebuild the whole scene, so its dependency array must stay
- * limited to stable callbacks.
+ * limited to stable callbacks (and stable refs).
  */
 export const useThreeScene = () => {
   const mountRef = useRef(null);
@@ -32,10 +38,20 @@ export const useThreeScene = () => {
   const { zoomLevel, zoomBy, panBy, syncCamera, resetCamera } =
     useCameraRig(cameraRef);
 
+  const {
+    isActiveRef: turntableActiveRef,
+    isActive: isTurntableActive,
+    toggle: toggleTurntable,
+    stop: stopTurntable,
+  } = useTurntable();
+
   const handleWheel = useCallback(
     (event) => {
       event.preventDefault();
-      zoomBy(normalizeWheelDelta(event) * ZOOM_SPEED_PER_PIXEL);
+      const speed = event.shiftKey
+        ? ZOOM_SPEED_PER_PIXEL * PRECISION_MODIFIER
+        : ZOOM_SPEED_PER_PIXEL;
+      zoomBy(normalizeWheelDelta(event) * speed);
     },
     [zoomBy],
   );
@@ -74,8 +90,11 @@ export const useThreeScene = () => {
 
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
-      if (meshRef.current && isPlaceholderRef.current) {
-        meshRef.current.rotation.y += IDLE_ROTATION_SPEED;
+      const mesh = meshRef.current;
+      if (mesh && isPlaceholderRef.current) {
+        mesh.rotation.y += IDLE_ROTATION_SPEED;
+      } else if (mesh && turntableActiveRef.current) {
+        mesh.rotation.y += TURNTABLE_ROTATION_SPEED;
       }
       renderer.render(scene, camera);
     };
@@ -102,7 +121,22 @@ export const useThreeScene = () => {
       stale.forEach(disposeMaterial);
       originalMaterials.clear();
     };
-  }, [handleWheel, syncCamera]);
+  }, [handleWheel, syncCamera, turntableActiveRef]);
+
+  /** Removes the mounted model and disposes everything it held. */
+  const disposeCurrentModel = useCallback(() => {
+    const scene = sceneRef.current;
+    if (!scene || !meshRef.current) return;
+
+    scene.remove(meshRef.current);
+
+    const stale = new Set();
+    originalMaterialsRef.current.forEach((mat) => collectMaterials(mat, stale));
+    collectSubtreeResources(meshRef.current, stale);
+    stale.forEach(disposeMaterial);
+    originalMaterialsRef.current.clear();
+    meshRef.current = null;
+  }, []);
 
   /**
    * Swaps in a freshly loaded model, disposing everything the previous one held.
@@ -117,17 +151,7 @@ export const useThreeScene = () => {
       const scene = sceneRef.current;
       if (!scene || !model) return;
 
-      if (meshRef.current) {
-        scene.remove(meshRef.current);
-
-        const stale = new Set();
-        originalMaterialsRef.current.forEach((mat) =>
-          collectMaterials(mat, stale),
-        );
-        collectSubtreeResources(meshRef.current, stale);
-        stale.forEach(disposeMaterial);
-        originalMaterialsRef.current.clear();
-      }
+      disposeCurrentModel();
 
       const pivot = createCenteredPivot(model);
       pivot.traverse((child) => {
@@ -141,8 +165,22 @@ export const useThreeScene = () => {
       isPlaceholderRef.current = false;
       resetCamera();
     },
-    [resetCamera],
+    [disposeCurrentModel, resetCamera],
   );
+
+  /** Returns the stage to its initial state: placeholder cube, camera home. */
+  const resetToPlaceholder = useCallback(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+
+    disposeCurrentModel();
+
+    const placeholder = createPlaceholderModel();
+    scene.add(placeholder);
+    meshRef.current = placeholder;
+    isPlaceholderRef.current = true;
+    resetCamera();
+  }, [disposeCurrentModel, resetCamera]);
 
   return {
     mountRef,
@@ -153,6 +191,11 @@ export const useThreeScene = () => {
     zoomLevel,
     resetCamera,
     handlePan: panBy,
+    handleZoom: zoomBy,
     replaceModel,
+    resetToPlaceholder,
+    isTurntableActive,
+    toggleTurntable,
+    stopTurntable,
   };
 };

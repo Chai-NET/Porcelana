@@ -22,3 +22,6 @@ export const ZOOM_SPEED_PER_PIXEL = 0.005;
 
 /** Radians per frame the placeholder model spins while idle. */
 export const IDLE_ROTATION_SPEED = 0.003;
+
+/** Radians per frame a loaded model spins while the turntable is running. */
+export const TURNTABLE_ROTATION_SPEED = 0.006;

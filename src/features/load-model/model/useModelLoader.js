@@ -91,6 +91,14 @@ export const useModelLoader = (replaceModel) => {
     [loadFromUrl],
   );
 
+  /** Returns the loader to its pre-upload state: placeholder stats, no texture. */
+  const reset = useCallback(() => {
+    setLoadingProgress(null);
+    setError("");
+    setModelTexture(null);
+    setStats(PLACEHOLDER_STATS);
+  }, []);
+
   return {
     loadingProgress,
     error,
@@ -98,5 +106,6 @@ export const useModelLoader = (replaceModel) => {
     stats,
     loadFile,
     loadPresetAsset,
+    reset,
   };
 };

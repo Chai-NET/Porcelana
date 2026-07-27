@@ -16,6 +16,7 @@ const ViewerStage = ({
     <ViewerCanvas
       mountRef={mountRef}
       onMouseDown={interaction.handleMouseDown}
+      onContextMenu={interaction.handleContextMenu}
       isDragging={interaction.isDragging}
       isPanning={interaction.isPanning}
     />

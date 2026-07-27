@@ -5,7 +5,8 @@ export default function Instructions() {
       <h4 className="my-2 font-semibold">How to use:</h4>
       <ul className="list-decimal space-y-1 pl-5 text-xs">
         <li>Upload your own 3D model.</li>
-        <li>Click and drag to rotate.</li>
+        <li>Drag to rotate, right-drag to pan, WASD to move.</li>
+        <li>Right-click for viewer options.</li>
         <li>Use view modes to inspect.</li>
         <li>Check model info for model details.</li>
       </ul>

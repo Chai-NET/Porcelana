@@ -1,10 +1,12 @@
 import { RotateCcw } from "lucide-react";
 import { AssetBrowserButton } from "@/features/browse-assets";
+import { KeybindsButton } from "@/features/keybinds-help";
 import FullscreenButton from "./FullscreenButton";
 import { TOOLBAR_BUTTON_CLASS } from "../config/toolbarButton";
 
 const ViewerToolbar = ({ onReset, onSelectAsset, isLoading }) => (
   <div className="fixed top-3 right-3 z-40 flex gap-2">
+    <KeybindsButton className={TOOLBAR_BUTTON_CLASS} />
     <AssetBrowserButton
       className={TOOLBAR_BUTTON_CLASS}
       onSelectAsset={onSelectAsset}
