@@ -12,11 +12,28 @@ import Controls from "../components/controls/Controls";
 import Sidebar from "../components/sidebar/Sidebar";
 
 const ViewerPage = () => {
-  const { mountRef, meshRef, zoomLevel, resetCamera, handlePan, replaceModel } =
-    useThreeScene();
-  const { loadingProgress, error, modelTexture, stats, handleFileUpload } =
-    useModelLoader(replaceModel);
-  const { viewMode, setViewMode } = useViewMode(meshRef, modelTexture);
+  const {
+    mountRef,
+    meshRef,
+    originalMaterialsRef,
+    zoomLevel,
+    resetCamera,
+    handlePan,
+    replaceModel,
+  } = useThreeScene();
+  const {
+    loadingProgress,
+    error,
+    modelTexture,
+    stats,
+    handleFileUpload,
+    loadPresetAsset,
+  } = useModelLoader(replaceModel);
+  const { viewMode, setViewMode } = useViewMode(
+    meshRef,
+    modelTexture,
+    originalMaterialsRef,
+  );
   const { handleMouseDown, isDragging, isPanning } = useRotation(
     meshRef,
     handlePan,
@@ -38,10 +55,17 @@ const ViewerPage = () => {
             isSmallScreen ? "opacity-100" : "opacity-0"
           }`}
         >
-          <ScreenAlert isSmallScreen={isSmallScreen} screenWidth={screenWidth} />
+          <ScreenAlert
+            isSmallScreen={isSmallScreen}
+            screenWidth={screenWidth}
+          />
         </div>
         <ErrorMessage error={error} />
-        <Controls onReset={resetCamera} />
+        <Controls
+          onReset={resetCamera}
+          onSelectAsset={loadPresetAsset}
+          isLoading={loadingProgress !== null}
+        />
         {loadingProgress === null && !error && (
           <ZoomIndicator zoomLevel={zoomLevel} />
         )}

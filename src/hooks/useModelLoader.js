@@ -1,8 +1,17 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import * as THREE from "three";
+import { analyzeModel } from "../lib/modelAnalysis";
 
 const FALLBACK_TEXTURE_URL =
   "https://threejs.org/examples/textures/uv_grid_opengl.jpg";
+
+const describeFile = (fileName, fileSize) => ({
+  format: ".glb",
+  fileName,
+  fileSize,
+  fileSizeKB: (fileSize / 1024).toFixed(2),
+  fileSizeMB: (fileSize / (1024 * 1024)).toFixed(2),
+});
 
 export const useModelLoader = (replaceModel) => {
   const [loadingProgress, setLoadingProgress] = useState(null); // null = idle, 0–100 = loading
@@ -14,166 +23,88 @@ export const useModelLoader = (replaceModel) => {
     format: "Default Cube",
   });
 
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  const loadFromUrl = useCallback(
+    async (url, { fileName, fileSize }, cleanup) => {
+      const fileDetails = describeFile(fileName, fileSize);
 
-    const fileExtension = file.name.split(".").pop().toLowerCase();
-    if (fileExtension !== "glb") {
-      setError("Only .glb files are supported.");
-      return;
-    }
+      setLoadingProgress(0);
+      setError("");
+      setStats((prev) => ({ ...prev, ...fileDetails }));
 
-    const fileName = file.name;
-    const fileSize = file.size;
-    const fileSizeKB = (fileSize / 1024).toFixed(2);
-    const fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
+      try {
+        const { GLTFLoader } = await import(
+          "three/examples/jsm/loaders/GLTFLoader.js"
+        );
 
-    setLoadingProgress(0);
-    setError("");
+        new GLTFLoader().load(
+          url,
+          (gltf) => {
+            const model = gltf.scene;
+            replaceModel(model);
 
-    setStats((prev) => ({
-      ...prev,
-      format: ".glb",
-      fileName,
-      fileSize,
-      fileSizeKB,
-      fileSizeMB,
-    }));
+            const { texture, ...modelStats } = analyzeModel(model);
+            setModelTexture(
+              texture ?? new THREE.TextureLoader().load(FALLBACK_TEXTURE_URL),
+            );
+            setStats({ ...modelStats, ...fileDetails });
+            setLoadingProgress(null);
+            cleanup?.();
+          },
+          (xhr) => {
+            if (xhr.total > 0) {
+              setLoadingProgress(Math.round((xhr.loaded / xhr.total) * 100));
+            }
+          },
+          (err) => {
+            setError("Failed to load GLB model. Please try a different file.");
+            setLoadingProgress(null);
+            cleanup?.();
+            console.error("Error loading GLB:", err);
+          },
+        );
+      } catch (err) {
+        setError("Failed to load 3D model. Please try a different file.");
+        setLoadingProgress(null);
+        cleanup?.();
+        console.error("Error loading file:", err);
+      }
+    },
+    [replaceModel],
+  );
 
-    try {
-      const { GLTFLoader } = await import(
-        "three/examples/jsm/loaders/GLTFLoader.js"
-      );
-      const loader = new GLTFLoader();
+  const handleFileUpload = useCallback(
+    (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.name.split(".").pop().toLowerCase() !== "glb") {
+        setError("Only .glb files are supported.");
+        return;
+      }
+
       const url = URL.createObjectURL(file);
-
-      loader.load(
-        url,
-        (gltf) => {
-          const model = gltf.scene;
-          replaceModel(model);
-
-          const materialAnalysis = {
-            hasPBR: false,
-            hasTextures: false,
-            textureTypes: [],
-            materialCount: 0,
-            materials: [],
-          };
-
-          let foundTexture = null;
-          const materialSet = new Set();
-
-          model.traverse((child) => {
-            if (!child.isMesh || !child.material) return;
-            const mat = child.material;
-            materialSet.add(mat);
-
-            if (mat.map) {
-              foundTexture = mat.map;
-              materialAnalysis.hasTextures = true;
-              if (!materialAnalysis.textureTypes.includes("diffuse/albedo"))
-                materialAnalysis.textureTypes.push("diffuse/albedo");
-            }
-
-            if (mat.isMeshStandardMaterial || mat.isMeshPhysicalMaterial) {
-              materialAnalysis.hasPBR = true;
-              const maps = {
-                normal: mat.normalMap,
-                roughness: mat.roughnessMap,
-                metalness: mat.metalnessMap,
-                "ambient occlusion": mat.aoMap,
-                emissive: mat.emissiveMap,
-                bump: mat.bumpMap,
-                displacement: mat.displacementMap,
-              };
-              Object.entries(maps).forEach(([label, tex]) => {
-                if (tex && !materialAnalysis.textureTypes.includes(label))
-                  materialAnalysis.textureTypes.push(label);
-              });
-            }
-
-            materialAnalysis.materials.push({
-              name: mat.name || "Unnamed Material",
-              type: mat.type,
-              isPBR: mat.isMeshStandardMaterial || mat.isMeshPhysicalMaterial,
-              hasTextures: !!(
-                mat.map ||
-                mat.normalMap ||
-                mat.roughnessMap ||
-                mat.metalnessMap ||
-                mat.aoMap ||
-                mat.emissiveMap
-              ),
-              color: mat.color ? `#${mat.color.getHexString()}` : null,
-              roughness: mat.roughness ?? null,
-              metalness: mat.metalness ?? null,
-            });
-          });
-
-          materialAnalysis.materialCount = materialSet.size;
-
-          setModelTexture(
-            foundTexture ??
-              new THREE.TextureLoader().load(FALLBACK_TEXTURE_URL),
-          );
-
-          let triangles = 0,
-            vertices = 0,
-            meshCount = 0;
-
-          model.traverse((child) => {
-            if (!child.isMesh || !child.geometry) return;
-            meshCount++;
-            triangles += child.geometry.index
-              ? child.geometry.index.count / 3
-              : child.geometry.attributes.position.count / 3;
-            vertices += child.geometry.attributes.position.count;
-          });
-
-          const box = new THREE.Box3().setFromObject(model);
-          const size = box.getSize(new THREE.Vector3());
-
-          setStats({
-            triangles: Math.floor(triangles),
-            vertices,
-            meshCount,
-            format: ".glb",
-            fileName,
-            fileSize,
-            fileSizeKB,
-            fileSizeMB,
-            dimensions: {
-              width: size.x.toFixed(2),
-              height: size.y.toFixed(2),
-              depth: size.z.toFixed(2),
-            },
-            materialAnalysis,
-          });
-
-          setLoadingProgress(null);
-          URL.revokeObjectURL(url);
-        },
-        (xhr) => {
-          // xhr.total equals file.size for blob: URLs, so progress is always accurate
-          if (xhr.total > 0) {
-            setLoadingProgress(Math.round((xhr.loaded / xhr.total) * 100));
-          }
-        },
-        (err) => {
-          setError("Failed to load GLB model. Please try a different file.");
-          setLoadingProgress(null);
-          URL.revokeObjectURL(url);
-          console.error("Error loading GLB:", err);
-        },
+      loadFromUrl(url, { fileName: file.name, fileSize: file.size }, () =>
+        URL.revokeObjectURL(url),
       );
-    } catch (err) {
-      setError("Failed to load 3D model. Please try a different file.");
-      setLoadingProgress(null);
-      console.error("Error loading file:", err);
-    }
-  };
+    },
+    [loadFromUrl],
+  );
 
-  return { loadingProgress, error, modelTexture, stats, handleFileUpload };
+  const loadPresetAsset = useCallback(
+    (asset) =>
+      loadFromUrl(asset.url, {
+        fileName: asset.fileName,
+        fileSize: asset.fileSize,
+      }),
+    [loadFromUrl],
+  );
+
+  return {
+    loadingProgress,
+    error,
+    modelTexture,
+    stats,
+    handleFileUpload,
+    loadPresetAsset,
+  };
 };

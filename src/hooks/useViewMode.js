@@ -1,26 +1,34 @@
 import { useState, useEffect } from "react";
 import { createMaterial } from "../lib/materials";
 
-export const useViewMode = (meshRef, modelTexture) => {
+export const useViewMode = (meshRef, modelTexture, originalMaterialsRef) => {
   const [viewMode, setViewMode] = useState("basecolor");
 
   useEffect(() => {
     if (!meshRef.current) return;
+    const originals = originalMaterialsRef.current;
 
     const applyMaterial = (object) => {
       if (object.isMesh) {
-        if (object.material?.dispose) object.material.dispose();
-        object.material = createMaterial(
-          viewMode,
-          object.geometry,
-          viewMode === "texture" ? modelTexture : undefined,
-        );
+        const original = originals.get(object);
+
+        if (object.material !== original && object.material?.dispose) {
+          object.material.dispose();
+        }
+        object.material =
+          viewMode === "original" && original
+            ? original
+            : createMaterial(
+                viewMode,
+                object.geometry,
+                viewMode === "texture" ? modelTexture : undefined,
+              );
       }
       object.children?.forEach(applyMaterial);
     };
 
     applyMaterial(meshRef.current);
-  }, [viewMode, modelTexture]);
+  }, [viewMode, modelTexture, meshRef, originalMaterialsRef]);
 
   return { viewMode, setViewMode };
 };

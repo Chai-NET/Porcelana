@@ -1,0 +1,16 @@
+[
+  {
+    "id": "old-armchair",
+    "name": "Old Armchair",
+    "file": "old_armchair.glb",
+    "fileSize": 2280164,
+    "triangles": 2588,
+    "vertices": 1677,
+    "credit": {
+      "creator": "MaX3Dd",
+      "url": "https://skfb.ly/pK9vB",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  }
+]

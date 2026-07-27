@@ -18,6 +18,25 @@ export const createMatcapTexture = () => {
   return texture;
 };
 
+const TEXTURE_SLOTS = [
+  "map",
+  "normalMap",
+  "roughnessMap",
+  "metalnessMap",
+  "aoMap",
+  "emissiveMap",
+  "bumpMap",
+  "displacementMap",
+];
+
+export const disposeMaterial = (material) => {
+  (Array.isArray(material) ? material : [material]).forEach((mat) => {
+    if (!mat) return;
+    TEXTURE_SLOTS.forEach((slot) => mat[slot]?.dispose());
+    mat.dispose();
+  });
+};
+
 export const createMaterial = (mode, geometry, customTexture) => {
   switch (mode) {
     case "wireframe":
@@ -39,6 +58,11 @@ export const createMaterial = (mode, geometry, customTexture) => {
 
     case "normals":
       return new THREE.MeshNormalMaterial();
+
+    case "original":
+      return new THREE.MeshLambertMaterial({
+        color: 0x869fef,
+      });
 
     case "texture":
       if (customTexture) {

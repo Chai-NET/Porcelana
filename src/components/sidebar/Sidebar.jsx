@@ -46,7 +46,11 @@ const Sidebar = ({ viewMode, setViewMode, stats, onFileUpload }) => {
       >
         <TitlePanel />
         <FileUpload onFileUpload={onFileUpload} />
-        <ViewModeControls viewMode={viewMode} setViewMode={setViewMode} />
+        <ViewModeControls
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          hasOriginal={!!stats.materialAnalysis}
+        />
         <ModelInfo stats={stats} />
         <h2 className="font-jost mx-auto py-3 text-center text-xs font-light">
           © {new Date().getFullYear()} | ChaiNET FOSS Project | chainet.dev{" "}

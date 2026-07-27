@@ -1,6 +1,13 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import * as THREE from "three";
-import { createMaterial } from "../lib/materials";
+import { createMaterial, disposeMaterial } from "../lib/materials";
+
+const collectMaterials = (source, into) => {
+  (Array.isArray(source) ? source : [source]).forEach((mat) => {
+    if (mat) into.add(mat);
+  });
+  return into;
+};
 
 export const useThreeScene = () => {
   const mountRef = useRef(null);
@@ -9,7 +16,8 @@ export const useThreeScene = () => {
   const cameraRef = useRef(null);
   const meshRef = useRef(null);
   const frameRef = useRef(null);
-  const isDefaultCubeRef = useRef(true); // ref — changing it won't re-run the scene effect
+  const isDefaultCubeRef = useRef(true);
+  const originalMaterialsRef = useRef(new Map());
   const panOffsetRef = useRef({ x: 0, y: 0 });
   const controlsRef = useRef({
     initialDistance: 5,
@@ -71,6 +79,8 @@ export const useThreeScene = () => {
   useEffect(() => {
     if (!mountRef.current) return;
 
+    const originalMaterials = originalMaterialsRef.current;
+
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x282424);
 
@@ -126,7 +136,7 @@ export const useThreeScene = () => {
 
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
-      // isDefaultCubeRef.current is read each frame — never stale, no re-render needed
+
       if (meshRef.current && isDefaultCubeRef.current) {
         meshRef.current.rotation.y += 0.003;
       }
@@ -151,18 +161,17 @@ export const useThreeScene = () => {
       }
       renderer.dispose();
       geometry.dispose();
-      material.dispose();
+
+      const stale = collectMaterials(material, new Set());
+      originalMaterials.forEach((mat) => collectMaterials(mat, stale));
       scene.traverse((object) => {
         if (object.geometry) object.geometry.dispose();
-        if (object.material) {
-          const mats = Array.isArray(object.material)
-            ? object.material
-            : [object.material];
-          mats.forEach((mat) => mat.dispose());
-        }
+        if (object.material) collectMaterials(object.material, stale);
       });
+      stale.forEach(disposeMaterial);
+      originalMaterials.clear();
     };
-  }, [centerAndScaleModel, handleWheel]); // isDefaultCubeRef removed — it's a ref, not state
+  }, [centerAndScaleModel, handleWheel]);
 
   const resetCamera = useCallback(() => {
     if (!cameraRef.current || !meshRef.current) return;
@@ -175,7 +184,7 @@ export const useThreeScene = () => {
 
   const handlePan = useCallback((deltaX, deltaY) => {
     if (!cameraRef.current) return;
-    // Scale pan speed relative to zoom distance so it feels consistent
+
     const panSpeed = controlsRef.current.currentDistance * 0.001;
     panOffsetRef.current.x -= deltaX * panSpeed;
     panOffsetRef.current.y += deltaY * panSpeed;
@@ -191,26 +200,29 @@ export const useThreeScene = () => {
 
       if (meshRef.current) {
         sceneRef.current.remove(meshRef.current);
+
+        const stale = new Set();
+        originalMaterialsRef.current.forEach((mat) =>
+          collectMaterials(mat, stale),
+        );
         meshRef.current.traverse((child) => {
           if (child.geometry) child.geometry.dispose();
-          if (child.material) {
-            const mats = Array.isArray(child.material)
-              ? child.material
-              : [child.material];
-            mats.forEach((mat) => {
-              if (mat.map) mat.map.dispose();
-              if (mat.normalMap) mat.normalMap.dispose();
-              if (mat.roughnessMap) mat.roughnessMap.dispose();
-              if (mat.metalnessMap) mat.metalnessMap.dispose();
-              mat.dispose();
-            });
-          }
+          if (child.material) collectMaterials(child.material, stale);
         });
+        stale.forEach(disposeMaterial);
+        originalMaterialsRef.current.clear();
       }
 
       sceneRef.current.add(newModel);
       meshRef.current = newModel;
-      isDefaultCubeRef.current = false; // ref mutation — no re-render, no scene teardown
+      isDefaultCubeRef.current = false;
+
+      newModel.traverse((child) => {
+        if (child.isMesh && child.material) {
+          originalMaterialsRef.current.set(child, child.material);
+        }
+      });
+
       centerAndScaleModel(newModel);
       resetCamera();
     },
@@ -222,6 +234,7 @@ export const useThreeScene = () => {
     sceneRef,
     cameraRef,
     meshRef,
+    originalMaterialsRef,
     zoomLevel,
     resetCamera,
     handlePan,

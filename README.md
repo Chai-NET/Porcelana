@@ -1,14 +1,15 @@
 <img src="/README_files/logoTitle.svg" alt="Porcelana logo" width="200" height="200">
 
 ## Porcelana
-##### © 2025 | ChaiNET FOSS Project | chainet.dev | Developed and maintained by [Pluwia ad Astra | ChaiNET](https://github.com/plwtx). | [plu.moe](https://plu.moe).
 
+##### © 2025 | ChaiNET FOSS Project | chainet.dev | Developed and maintained by [Pluwia ad Astra | ChaiNET](https://github.com/plwtx). | [plu.moe](https://plu.moe).
 
 A free, open-source web application for uploading and viewing 3D models in your browser.
 
 - Upload and interact with your 3D models.
 - Switch between view modes (solid, wireframe, etc.).
 - View model stats: vertex/triangle counts and etc.
+- Browse and load bundled sample models from the asset library.
 
 ###### UI of the applicaiton:
 
@@ -21,6 +22,20 @@ If you want to run it locally or modify it:
 2. run: npm run dev
 
 ###### _P도자기_ (KR: P Ceramics) - **Porcelain** has no meaning besides the idea of inspecting the ceramic art.
+
+---
+
+### Bundled 3D models
+
+Porcelana ships with sample models in its asset library. These are the work of their respective authors and are **not** covered by the project license below, they keep their own licenses, listed here.
+
+| Model        | Author | Source                                 | License                                                   |
+| ------------ | ------ | -------------------------------------- | --------------------------------------------------------- |
+| Old Armchair | MaX3Dd | [skfb.ly/pK9vB](https://skfb.ly/pK9vB) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+
+> "Old Armchair" by MaX3Dd is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+If you redistribute or fork this project, keep these attributions intact. Model metadata lives in [`src/data/presetAssets.json`](src/data/presetAssets.json).
 
 ---
 
