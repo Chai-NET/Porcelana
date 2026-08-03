@@ -19,13 +19,6 @@ import { normalizeWheelDelta } from "../lib/zoom";
 import { useCameraRig } from "./useCameraRig";
 import { useTurntable } from "./useTurntable";
 
-/**
- * Owns the renderer, the scene graph and the model currently mounted in it.
- *
- * Mutable scene facts live in refs, not state: re-running the setup effect would
- * tear down and rebuild the whole scene, so its dependency array must stay
- * limited to stable callbacks (and stable refs).
- */
 export const useThreeScene = () => {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
@@ -35,14 +28,17 @@ export const useThreeScene = () => {
   const isPlaceholderRef = useRef(true);
   const originalMaterialsRef = useRef(new Map());
 
-  const { zoomLevel, zoomBy, panBy, syncCamera, resetCamera } =
+  const { zoomLevel, zoomBy, panBy, syncCamera, resetCamera, zoomLock } =
     useCameraRig(cameraRef);
 
   const {
     isActiveRef: turntableActiveRef,
     isActive: isTurntableActive,
     toggle: toggleTurntable,
-    stop: stopTurntable,
+    reset: resetTurntable,
+    speedRef: turntableSpeedRef,
+    speed: turntableSpeed,
+    startAt: startTurntableAt,
   } = useTurntable();
 
   const handleWheel = useCallback(
@@ -91,10 +87,11 @@ export const useThreeScene = () => {
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
       const mesh = meshRef.current;
-      if (mesh && isPlaceholderRef.current) {
-        mesh.rotation.y += IDLE_ROTATION_SPEED;
-      } else if (mesh && turntableActiveRef.current) {
-        mesh.rotation.y += TURNTABLE_ROTATION_SPEED;
+      if (mesh && turntableActiveRef.current) {
+        const baseSpeed = isPlaceholderRef.current
+          ? IDLE_ROTATION_SPEED
+          : TURNTABLE_ROTATION_SPEED;
+        mesh.rotation.y += baseSpeed * turntableSpeedRef.current;
       }
       renderer.render(scene, camera);
     };
@@ -121,9 +118,8 @@ export const useThreeScene = () => {
       stale.forEach(disposeMaterial);
       originalMaterials.clear();
     };
-  }, [handleWheel, syncCamera, turntableActiveRef]);
+  }, [handleWheel, syncCamera, turntableActiveRef, turntableSpeedRef]);
 
-  /** Removes the mounted model and disposes everything it held. */
   const disposeCurrentModel = useCallback(() => {
     const scene = sceneRef.current;
     if (!scene || !meshRef.current) return;
@@ -138,14 +134,6 @@ export const useThreeScene = () => {
     meshRef.current = null;
   }, []);
 
-  /**
-   * Swaps in a freshly loaded model, disposing everything the previous one held.
-   *
-   * The authored materials are stashed here, synchronously, before returning:
-   * this runs inside the loader callback while useViewMode's effect only runs
-   * after the next render, so anything not captured now is overwritten before
-   * a reference to it exists.
-   */
   const replaceModel = useCallback(
     (model) => {
       const scene = sceneRef.current;
@@ -168,7 +156,6 @@ export const useThreeScene = () => {
     [disposeCurrentModel, resetCamera],
   );
 
-  /** Returns the stage to its initial state: placeholder cube, camera home. */
   const resetToPlaceholder = useCallback(() => {
     const scene = sceneRef.current;
     if (!scene) return;
@@ -196,6 +183,12 @@ export const useThreeScene = () => {
     resetToPlaceholder,
     isTurntableActive,
     toggleTurntable,
-    stopTurntable,
+    resetTurntable,
+    turntableSpeed,
+    startTurntableAt,
+    isZoomUnlocked: zoomLock.isUnlocked,
+    zoomBlockedCount: zoomLock.blockedCount,
+    toggleZoomLock: zoomLock.toggle,
+    resetZoomLock: zoomLock.reset,
   };
 };

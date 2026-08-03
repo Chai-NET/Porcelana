@@ -1,17 +1,30 @@
 import { MAX_ZOOM_PERCENT } from "@/entities/scene";
+import ZoomLockButton from "./ZoomLockButton";
 
-const ZoomIndicator = ({ zoomLevel }) => {
+const ZoomIndicator = ({
+  zoomLevel,
+  isZoomUnlocked,
+  zoomBlockedCount,
+  onToggleZoomLock,
+}) => {
   const barFill = Math.max(
     0,
     Math.min(100, (zoomLevel / MAX_ZOOM_PERCENT) * 100),
   );
+  const isPastLimit = zoomLevel > MAX_ZOOM_PERCENT;
 
   return (
-    <div className="absolute right-3 bottom-3">
+    <div className="absolute right-3 bottom-3 flex items-center gap-2">
+      <ZoomLockButton
+        isUnlocked={isZoomUnlocked}
+        blockedCount={zoomBlockedCount}
+        onToggle={onToggleZoomLock}
+      />
+
       <div className="bg-dark25 border-dark44 rounded-lg border px-4 py-3 backdrop-blur-sm">
         <div className="flex min-w-[200px] items-center space-x-3">
           {/* Zoom percentage display */}
-          <div className="min-w-[3rem] text-center font-mono text-sm tracking-widest text-zinc-100">
+          <div className="min-w-[3.5rem] text-center font-mono text-sm tracking-widest text-zinc-100">
             {zoomLevel}%
           </div>
 
@@ -20,7 +33,9 @@ const ZoomIndicator = ({ zoomLevel }) => {
             <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-700">
               {/* Progress fill */}
               <div
-                className="from-accent border-dark44 h-full rounded-full border bg-gradient-to-l to-zinc-900 transition-all duration-150 ease-out"
+                className={`from-accent border-dark44 h-full rounded-full border bg-gradient-to-l to-zinc-900 transition-all duration-150 ease-out ${
+                  isPastLimit ? "shadow-[0_0_10px_var(--color-accent)]" : ""
+                }`}
                 style={{ width: `${barFill}%` }}
               />
             </div>
@@ -34,8 +49,10 @@ const ZoomIndicator = ({ zoomLevel }) => {
 
           {/* Zoom labels */}
           <div className="flex flex-col text-xs leading-tight text-gray-400">
-            <span>0 - {MAX_ZOOM_PERCENT}%</span>
-            <span className="text-zinc-300">Zoom</span>
+            <span>{isZoomUnlocked ? "0 - ∞" : `0 - ${MAX_ZOOM_PERCENT}%`}</span>
+            <span className={isZoomUnlocked ? "text-accent" : "text-zinc-300"}>
+              {isZoomUnlocked ? "Unlimited" : "Zoom"}
+            </span>
           </div>
         </div>
       </div>

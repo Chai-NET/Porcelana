@@ -1,24 +1,39 @@
 import { useRef, useState, useCallback } from "react";
+import { DEFAULT_TURNTABLE_SPEED } from "../config/scene";
 
-/**
- * Turntable on/off is both a render-loop fact (read fresh every frame, so a
- * ref) and a UI fact (the menu label, so state). This hook keeps the two in
- * sync behind one setter.
- */
 export const useTurntable = () => {
-  const isActiveRef = useRef(false);
-  const [isActive, setIsActive] = useState(false);
+  const isActiveRef = useRef(true);
+  const [isActive, setIsActive] = useState(true);
+  const speedRef = useRef(DEFAULT_TURNTABLE_SPEED);
+  const [speed, setSpeedState] = useState(DEFAULT_TURNTABLE_SPEED);
 
   const setActive = useCallback((value) => {
     isActiveRef.current = value;
     setIsActive(value);
   }, []);
 
+  const setSpeed = useCallback((value) => {
+    speedRef.current = value;
+    setSpeedState(value);
+  }, []);
+
   const toggle = useCallback(
     () => setActive(!isActiveRef.current),
     [setActive],
   );
-  const stop = useCallback(() => setActive(false), [setActive]);
 
-  return { isActiveRef, isActive, toggle, stop };
+  const startAt = useCallback(
+    (value) => {
+      setSpeed(value);
+      setActive(true);
+    },
+    [setSpeed, setActive],
+  );
+
+  const reset = useCallback(() => {
+    setActive(true);
+    setSpeed(DEFAULT_TURNTABLE_SPEED);
+  }, [setActive, setSpeed]);
+
+  return { isActiveRef, isActive, toggle, reset, speedRef, speed, startAt };
 };

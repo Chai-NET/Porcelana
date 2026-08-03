@@ -1,26 +1,20 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { CAMERA, PAN_SPEED_PER_UNIT } from "../config/scene";
 import {
   clampDistance,
   distanceToZoomPercent,
   DEFAULT_ZOOM_PERCENT,
 } from "../lib/zoom";
+import { useZoomLock } from "./useZoomLock";
 
-/**
- * Owns where the camera sits. There is no OrbitControls: the camera stays
- * axis-aligned at (panX, panY, distance) looking at (panX, panY, 0), and
- * "rotation" turns the model instead.
- *
- * Distance and pan are refs because the render loop reads them every frame and
- * must never see a stale value; only `zoomLevel` is state, because it is the one
- * fact the UI draws.
- */
 export const useCameraRig = (cameraRef) => {
   const panOffsetRef = useRef({ x: 0, y: 0 });
   const distanceRef = useRef(CAMERA.initialDistance);
   const [zoomLevel, setZoomLevel] = useState(DEFAULT_ZOOM_PERCENT);
 
-  /** Pushes the current distance/pan onto the camera. */
+  const zoomLock = useZoomLock();
+  const { isUnlocked, isUnlockedRef, reportBlocked } = zoomLock;
+
   const syncCamera = useCallback(() => {
     const camera = cameraRef.current;
     if (!camera) return;
@@ -30,14 +24,25 @@ export const useCameraRig = (cameraRef) => {
     camera.lookAt(x, y, 0);
   }, [cameraRef]);
 
-  /** `delta` is a signed distance change: positive moves the camera away. */
-  const zoomBy = useCallback(
-    (delta) => {
-      distanceRef.current = clampDistance(distanceRef.current + delta);
+  /** Moves the camera to `distance` and republishes the readout. */
+  const applyDistance = useCallback(
+    (distance) => {
+      distanceRef.current = distance;
       syncCamera();
-      setZoomLevel(distanceToZoomPercent(distanceRef.current));
+      setZoomLevel(distanceToZoomPercent(distance));
     },
     [syncCamera],
+  );
+
+  const zoomBy = useCallback(
+    (delta) => {
+      const requested = distanceRef.current + delta;
+      const next = clampDistance(requested, isUnlockedRef.current);
+
+      if (requested < next) reportBlocked();
+      applyDistance(next);
+    },
+    [applyDistance, isUnlockedRef, reportBlocked],
   );
 
   const panBy = useCallback(
@@ -52,10 +57,13 @@ export const useCameraRig = (cameraRef) => {
 
   const resetCamera = useCallback(() => {
     panOffsetRef.current = { x: 0, y: 0 };
-    distanceRef.current = CAMERA.initialDistance;
-    syncCamera();
-    setZoomLevel(DEFAULT_ZOOM_PERCENT);
-  }, [syncCamera]);
+    applyDistance(CAMERA.initialDistance);
+  }, [applyDistance]);
 
-  return { zoomLevel, zoomBy, panBy, syncCamera, resetCamera };
+  useEffect(() => {
+    if (isUnlocked || distanceRef.current >= CAMERA.minDistance) return;
+    applyDistance(CAMERA.minDistance);
+  }, [isUnlocked, applyDistance]);
+
+  return { zoomLevel, zoomBy, panBy, syncCamera, resetCamera, zoomLock };
 };

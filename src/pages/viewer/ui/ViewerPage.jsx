@@ -24,7 +24,13 @@ const ViewerPage = () => {
     resetToPlaceholder,
     isTurntableActive,
     toggleTurntable,
-    stopTurntable,
+    resetTurntable,
+    turntableSpeed,
+    startTurntableAt,
+    isZoomUnlocked,
+    zoomBlockedCount,
+    toggleZoomLock,
+    resetZoomLock,
   } = useThreeScene();
 
   const {
@@ -50,13 +56,15 @@ const ViewerPage = () => {
 
   /** Back to a fresh session: placeholder cube, home camera, defaults. */
   const resetViewer = useCallback(() => {
-    stopTurntable();
+    resetTurntable();
+    resetZoomLock();
     turnLightOff();
     resetToPlaceholder();
     resetLoader();
     setViewMode(DEFAULT_VIEW_MODE);
   }, [
-    stopTurntable,
+    resetTurntable,
+    resetZoomLock,
     turnLightOff,
     resetToPlaceholder,
     resetLoader,
@@ -71,6 +79,9 @@ const ViewerPage = () => {
         loadingProgress={loadingProgress}
         error={error}
         zoomLevel={zoomLevel}
+        isZoomUnlocked={isZoomUnlocked}
+        zoomBlockedCount={zoomBlockedCount}
+        onToggleZoomLock={toggleZoomLock}
       >
         <ViewerToolbar
           onReset={resetCamera}
@@ -85,6 +96,8 @@ const ViewerPage = () => {
             onRepositionCamera={resetCamera}
             isTurntableActive={isTurntableActive}
             onToggleTurntable={toggleTurntable}
+            turntableSpeed={turntableSpeed}
+            onSelectTurntableSpeed={startTurntableAt}
             isLightOn={isLightOn}
             onToggleLight={toggleLight}
           />

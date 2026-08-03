@@ -10,6 +10,9 @@ const ViewerStage = ({
   loadingProgress,
   error,
   zoomLevel,
+  isZoomUnlocked,
+  zoomBlockedCount,
+  onToggleZoomLock,
   children,
 }) => (
   <div className="relative flex-1 overflow-hidden">
@@ -25,7 +28,12 @@ const ViewerStage = ({
     <ErrorMessage error={error} />
     {children}
     {loadingProgress === null && !error && (
-      <ZoomIndicator zoomLevel={zoomLevel} />
+      <ZoomIndicator
+        zoomLevel={zoomLevel}
+        isZoomUnlocked={isZoomUnlocked}
+        zoomBlockedCount={zoomBlockedCount}
+        onToggleZoomLock={onToggleZoomLock}
+      />
     )}
   </div>
 );
